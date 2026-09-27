@@ -63,7 +63,7 @@ Weitere Befehle: `npm run check` (Typprüfung), `npm test` (Tests), `npm run bui
 ## Auf dem Server (Portainer + Cloudflare Tunnel)
 
 1. **Image**: GitHub Actions baut bei jedem Push auf `main` das Image
-   `ghcr.io/backyardboys-design/byb-webshop:latest`. Ist das Repository privat, in Portainer unter
+   `ghcr.io/mstreicher98/backyardboys-webshop:latest`. Ist das Repository privat, in Portainer unter
    *Registries* `ghcr.io` mit einem GitHub-Token (Recht `read:packages`) hinterlegen – oder das Paket auf GitHub öffentlich stellen.
 2. **Tunnel**: In Cloudflare unter *Zero Trust → Networks → Tunnels* einen Tunnel anlegen und das Token kopieren.
    Unter *Public Hostnames* beide Adressen auf `http://app:3000` zeigen lassen:

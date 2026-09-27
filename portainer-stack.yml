@@ -22,7 +22,7 @@
 
 services:
   app:
-    image: ghcr.io/backyardboys-design/byb-webshop:latest
+    image: ghcr.io/mstreicher98/backyardboys-webshop:latest
     restart: unless-stopped
     environment:
       SHOP_URL: ${SHOP_URL}
