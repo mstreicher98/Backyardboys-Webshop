@@ -65,9 +65,15 @@ Weitere Befehle: `npm run check` (Typprüfung), `npm test` (Tests), `npm run bui
 1. **Image**: GitHub Actions baut bei jedem Push auf `main` das Image
    `ghcr.io/mstreicher98/backyardboys-webshop:latest`. Ist das Repository privat, in Portainer unter
    *Registries* `ghcr.io` mit einem GitHub-Token (Recht `read:packages`) hinterlegen – oder das Paket auf GitHub öffentlich stellen.
-2. **Tunnel**: In Cloudflare unter *Zero Trust → Networks → Tunnels* einen Tunnel anlegen und das Token kopieren.
-   Unter *Public Hostnames* beide Adressen auf `http://app:3000` zeigen lassen:
-   `shop.backyardboys.at` und `admin.backyardboys.at`.
+2. **Tunnel**: Im Cloudflare-Dashboard unter *Networking → Tunnels → Create a tunnel* (Typ *Cloudflared*)
+   einen Tunnel anlegen. Beim Schritt *Install connector* nur das lange Token (beginnt mit `eyJ`) kopieren –
+   installieren muss man nichts, das übernimmt der Dienst `cloudflared` im Stack.
+   Dann im Tunnel unter *Routes → Add route → Published application* zwei Routen anlegen:
+
+   | Subdomain | Domain | Service URL |
+   |---|---|---|
+   | `shop` | `backyardboys.at` | `http://app:3000` |
+   | `admin` | `backyardboys.at` | `http://app:3000` |
 3. **Stack**: In Portainer *Stacks → Add stack*, Inhalt von [`portainer-stack.yml`](portainer-stack.yml) einfügen und die
    Variablen setzen (`SHOP_URL`, `ADMIN_URL`, `TUNNEL_TOKEN`, `APP_SECRET`). `APP_SECRET` gut aufbewahren –
    damit sind die Zugangsdaten für Stripe, PayPal und SMTP verschlüsselt.
@@ -75,6 +81,23 @@ Weitere Befehle: `npm run check` (Typprüfung), `npm test` (Tests), `npm run bui
 
 **Neue Version:** Stack → *Update the stack* mit *Re-pull image and redeploy*. Automatisch geht es, wenn in Portainer
 ein Webhook für den Stack angelegt und dessen Adresse als GitHub-Secret `PORTAINER_WEBHOOK_URL` hinterlegt wird.
+
+### Cloudflare Tunnel: wenn es nicht klappt
+
+- **„An A, AAAA, or CNAME record with that host already exists“** beim Anlegen der Route: Die Adresse ist im
+  DNS schon vergeben – meist noch vom Prototyp (der hatte eigene Tunnel für `shop` und `admin`).
+  Unter *DNS → Records* die Einträge `shop` und `admin` löschen (oder beim alten Tunnel die Routen entfernen)
+  und die Route erneut anlegen. Laufen die alten `cloudflared`-Container des Prototyps noch, in Portainer stoppen.
+- **Domain steht nicht zur Auswahl**: `backyardboys.at` muss im selben Cloudflare-Konto als Website eingetragen
+  sein und die Nameserver von Cloudflare verwenden.
+- **Fehler 502 / „Bad gateway“**: `cloudflared` erreicht die App nicht. Die Service URL muss genau
+  `http://app:3000` lauten (nicht `https`, nicht `localhost`), und `cloudflared` muss im selben Stack laufen
+  wie `app` – ein Tunnel-Container aus einem anderen Stack kennt den Namen `app` nicht.
+  Im Log von `app` prüfen, ob die App läuft (Portainer → Container `app` → Logs).
+- **Tunnel bleibt „Inactive“ bzw. „Down“**: `TUNNEL_TOKEN` falsch oder unvollständig kopiert. Im Log von
+  `cloudflared` steht dann „Unauthorized“ oder „Invalid tunnel secret“.
+- **admin.… zeigt den Shop oder leitet im Kreis**: `SHOP_URL` und `ADMIN_URL` im Stack prüfen
+  (mit `https://`, ohne Schrägstrich am Ende), danach den Stack neu starten.
 
 Alle Daten (Datenbank, Bilder, Kunden-Dateien, Sicherungen) liegen im Volume `byb-data` unter `/data`.
 Beim Entfernen des Stacks das Volume **nicht** mitlöschen.

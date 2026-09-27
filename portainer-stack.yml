@@ -11,11 +11,15 @@
 #   INITIAL_ADMIN_USERNAME  optional, Standard „admin“
 #   INITIAL_ADMIN_PASSWORD  optional – leer lassen: wird erzeugt und einmalig im Log angezeigt
 #
-# Cloudflare: Zero Trust → Networks → Tunnels → Tunnel anlegen → Token kopieren.
-# Beim Tunnel unter „Public Hostnames“ BEIDE Adressen auf denselben Dienst zeigen lassen:
-#   shop.backyardboys.at   →  HTTP  app:3000
-#   admin.backyardboys.at  →  HTTP  app:3000
+# Cloudflare (Dashboard, Stand 2026): Networking → Tunnels → „Create a tunnel“ →
+# Typ „Cloudflared“, Namen vergeben, beim Schritt „Install connector“ den Befehl für Docker
+# anzeigen lassen und NUR das lange Token (ab „eyJ…“) als TUNNEL_TOKEN kopieren – installieren
+# nicht nötig, das macht der Dienst „cloudflared“ unten.
+# Danach im Tunnel: Tab „Routes“ → „Add route“ → „Published application“, zweimal:
+#   Subdomain shop   · Domain backyardboys.at · Service URL  http://app:3000
+#   Subdomain admin  · Domain backyardboys.at · Service URL  http://app:3000
 # Der Shop erkennt an der Adresse, ob Shop oder interner Bereich gemeint ist.
+# Klappt das nicht, siehe README → „Cloudflare Tunnel: wenn es nicht klappt“.
 #
 # Neue Version einspielen: Stack → Editor → „Update the stack“ mit „Re-pull image and redeploy“
 # (oder automatisch per Webhook, siehe README).
