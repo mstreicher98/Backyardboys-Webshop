@@ -13,7 +13,7 @@
 	import { getI18n, switchLocalePath } from '$lib/i18n.svelte';
 	import { dur } from '$lib/motion';
 	import type { CategoryNode } from '$lib/server/shop/catalog';
-	import Picture from './Picture.svelte';
+	import MegaMenu from './MegaMenu.svelte';
 
 	interface Props {
 		menu: CategoryNode[];
@@ -128,29 +128,7 @@
 
 	{#if current}
 		<div id="mega" class="mega only-desktop" role="presentation" onmouseenter={() => enter(current.id)} onmouseleave={leave} out:fade={{ duration: dur(140) }}>
-			{#key current.id}
-			<div class="mega-in wrap">
-				<a class="mega-hero slant" href={i.href(`/kategorie/${current.slug}`)}>
-					{#if current.image}<Picture media={current.image} sizes="40vw" want={1200} alt="" />{/if}
-					<span class="mega-hero-text">
-						<span class="h3">{current.name}</span>
-						<span class="muted small">{i.tr('Alle anzeigen', 'View all')}</span>
-					</span>
-				</a>
-				<div class="mega-list">
-					{#if current.tagline}<p class="mega-tag">{current.tagline}</p>{/if}
-					{#each current.children as child, n (child.id)}
-						<a class="mega-row" style="--i: {n}" href={i.href(`/kategorie/${child.slug}`)}>
-							<span class="thumb slant">{#if child.image}<Picture media={child.image} sizes="160px" want={400} alt="" />{/if}</span>
-							<span>
-								{#if child.tagline}<span class="row-tag">{child.tagline}</span>{/if}
-								<span class="row-name">{child.name}</span>
-							</span>
-						</a>
-					{/each}
-				</div>
-			</div>
-			{/key}
+			{#key current.id}<MegaMenu category={current} />{/key}
 		</div>
 	{/if}
 </header>
@@ -440,118 +418,11 @@
 			clip-path: inset(0 0 -6rem 0);
 		}
 	}
-	.mega-in {
-		display: grid;
-		grid-template-columns: 5fr 7fr;
-		gap: 2.5rem;
-		padding-block: 1.75rem 2.25rem;
-	}
-	.mega-hero {
-		--cut: 5rem;
-		position: relative;
-		display: block;
-		height: 26rem;
-		background: #18181b;
-		overflow: hidden;
-		color: #fff;
-		text-decoration: none;
-	}
-	.mega-hero :global(img) {
-		width: 100%;
-		height: 100%;
-		object-fit: cover;
-		animation: settle 900ms var(--ease-expo) both;
-		transition: transform 700ms var(--ease-expo);
-	}
-	.mega-hero:hover :global(img) {
-		transform: scale(1.04);
-	}
-	@keyframes settle {
-		from {
-			opacity: 0;
-			scale: 1.1;
-		}
-	}
-	.mega-hero::after {
-		content: '';
-		position: absolute;
-		inset: 0;
-		background: linear-gradient(to top, rgb(0 0 0 / 0.7), transparent 45%);
-	}
-	.mega-hero-text {
-		position: absolute;
-		left: 1.4rem;
-		bottom: 1.2rem;
-		z-index: 1;
-		display: flex;
-		flex-direction: column;
-	}
-	.mega-list {
-		display: flex;
-		flex-direction: column;
-		gap: 1rem;
-		padding-top: 0.5rem;
-	}
-	.mega-tag {
-		color: #a1a1aa;
-		font-weight: 600;
-		margin-bottom: 0.25rem;
-	}
-	.mega-row {
-		display: flex;
-		align-items: center;
-		gap: 1.25rem;
-		background: #0f0f11;
-		color: #fff;
-		text-decoration: none;
-		transition:
-			background-color 200ms,
-			transform 300ms var(--ease-expo);
-		animation: row-in 520ms var(--ease-expo) both;
-		animation-delay: calc(70ms + var(--i, 0) * 45ms);
-	}
-	.mega-row:hover {
-		background: #18181b;
-		transform: translateX(0.35rem);
-	}
 	@keyframes row-in {
 		from {
 			opacity: 0;
 			transform: translateX(-1.25rem);
 		}
-	}
-	.mega-row .thumb :global(img) {
-		transition: transform 600ms var(--ease-expo);
-	}
-	.mega-row:hover .thumb :global(img) {
-		transform: scale(1.08);
-	}
-	.thumb {
-		--cut: 1.1rem;
-		flex-shrink: 0;
-		width: 9rem;
-		height: 5.75rem;
-		background: #18181b;
-		overflow: hidden;
-	}
-	.thumb :global(img) {
-		width: 100%;
-		height: 100%;
-		object-fit: cover;
-	}
-	.row-tag {
-		display: block;
-		font-size: 0.75rem;
-		font-weight: 600;
-		color: #a1a1aa;
-	}
-	.row-name {
-		display: block;
-		font-size: 1.35rem;
-		font-weight: 800;
-		font-stretch: 118%;
-		text-transform: uppercase;
-		line-height: 1.1;
 	}
 
 	/* Mobiles Menü */
