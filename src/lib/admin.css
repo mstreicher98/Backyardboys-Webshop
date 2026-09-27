@@ -1,0 +1,452 @@
+/* Bausteine des internen Bereichs. Nur im Admin-Layout geladen. */
+
+.adm {
+	--sidebar: 15.5rem;
+	background: var(--c-bg);
+	color: var(--c-ink);
+	min-height: 100dvh;
+	font-size: 0.95rem;
+}
+:root:not([data-theme='dark']) .adm {
+	--c-bg: #f4f4f5;
+}
+@media (prefers-color-scheme: dark) {
+	:root:not([data-theme='light']) .adm {
+		--c-bg: #09090b;
+	}
+}
+
+/* ---------------- Seitenkopf */
+.adm .page-head {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: flex-end;
+	justify-content: space-between;
+	gap: 1rem;
+	margin-bottom: 1.5rem;
+}
+.adm .page-title {
+	font-size: 1.9rem;
+	font-weight: 800;
+	font-stretch: 72%;
+	line-height: 1.05;
+}
+.adm .page-sub {
+	margin-top: 0.3rem;
+	color: var(--c-ink-3);
+}
+.adm .back {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.3rem;
+	margin-bottom: 0.6rem;
+	font-size: 0.875rem;
+	font-weight: 600;
+	color: var(--c-ink-3);
+	text-decoration: none;
+}
+.adm .back:hover {
+	color: var(--c-ink);
+}
+
+/* ---------------- Karten */
+.adm .card {
+	background: var(--c-surface);
+	border: 1px solid var(--c-line);
+	border-radius: var(--radius-card);
+	box-shadow: var(--shadow-card);
+}
+.adm .card-pad {
+	padding: 1.25rem;
+}
+@media (min-width: 640px) {
+	.adm .card-pad {
+		padding: 1.5rem;
+	}
+}
+.adm .card-title {
+	font-size: 1.1rem;
+	font-weight: 750;
+	font-stretch: 85%;
+}
+.adm .card-sub {
+	margin-top: 0.15rem;
+	font-size: 0.875rem;
+	color: var(--c-ink-3);
+}
+
+/* ---------------- Knöpfe */
+.adm .btn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.45rem;
+	height: 2.6rem;
+	padding: 0 1rem;
+	border-radius: var(--radius-field);
+	border: 1px solid var(--c-line-strong);
+	background: var(--c-surface);
+	color: var(--c-ink);
+	font-weight: 650;
+	font-size: 0.925rem;
+	white-space: nowrap;
+	text-decoration: none;
+	transition:
+		background-color 120ms,
+		border-color 120ms,
+		color 120ms;
+}
+.adm .btn:hover {
+	border-color: var(--c-ink-3);
+}
+.adm .btn:disabled {
+	opacity: 0.55;
+}
+.adm .btn-primary {
+	background: var(--c-accent);
+	border-color: var(--c-accent);
+	color: #fff;
+}
+.adm .btn-primary:hover {
+	background: var(--c-accent-deep);
+	border-color: var(--c-accent-deep);
+}
+:root[data-theme='dark'] .adm .btn-primary,
+:root[data-theme='dark'] .adm .btn-primary:hover {
+	color: #09090b;
+}
+@media (prefers-color-scheme: dark) {
+	:root:not([data-theme='light']) .adm .btn-primary,
+	:root:not([data-theme='light']) .adm .btn-primary:hover {
+		color: #09090b;
+	}
+}
+.adm .btn-ghost {
+	border-color: transparent;
+	background: transparent;
+}
+.adm .btn-ghost:hover {
+	background: var(--c-surface-3);
+	border-color: transparent;
+}
+.adm .btn-danger {
+	color: var(--c-danger);
+	border-color: color-mix(in srgb, var(--c-danger) 35%, transparent);
+}
+.adm .btn-danger:hover {
+	background: var(--c-danger-soft);
+	border-color: var(--c-danger);
+}
+.adm .btn-sm {
+	height: 2.1rem;
+	padding: 0 0.7rem;
+	font-size: 0.85rem;
+}
+.adm .btn-icon {
+	width: 2.4rem;
+	padding: 0;
+}
+
+/* ---------------- Formulare */
+.adm .field {
+	display: flex;
+	flex-direction: column;
+	gap: 0.35rem;
+}
+.adm .label {
+	font-size: 0.875rem;
+	font-weight: 650;
+	color: var(--c-ink-2);
+}
+.adm .label .opt {
+	font-weight: 450;
+	color: var(--c-ink-3);
+}
+.adm .hint {
+	font-size: 0.8rem;
+	color: var(--c-ink-3);
+	line-height: 1.4;
+}
+.adm .input,
+.adm .select,
+.adm .textarea {
+	width: 100%;
+	min-height: 2.65rem;
+	padding: 0.55rem 0.75rem;
+	border-radius: var(--radius-field);
+	border: 1px solid var(--c-line-strong);
+	background: var(--c-surface);
+	color: var(--c-ink);
+	font: inherit;
+	font-size: 16px; /* verhindert Zoom auf dem iPhone */
+	transition:
+		border-color 120ms,
+		box-shadow 120ms;
+}
+@media (min-width: 640px) {
+	.adm .input,
+	.adm .select,
+	.adm .textarea {
+		font-size: 0.95rem;
+	}
+}
+.adm .input:focus,
+.adm .select:focus,
+.adm .textarea:focus {
+	outline: none;
+	border-color: var(--c-focus);
+	box-shadow: 0 0 0 3px color-mix(in srgb, var(--c-focus) 22%, transparent);
+}
+.adm .textarea {
+	min-height: 6rem;
+	resize: vertical;
+	line-height: 1.5;
+}
+.adm .select {
+	appearance: none;
+	padding-right: 2.2rem;
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%2366727f' stroke-width='2' viewBox='0 0 24 24'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+	background-repeat: no-repeat;
+	background-position: right 0.7rem center;
+}
+.adm .check {
+	display: flex;
+	align-items: flex-start;
+	gap: 0.6rem;
+	cursor: pointer;
+}
+.adm .check input {
+	width: 1.15rem;
+	height: 1.15rem;
+	margin-top: 0.15rem;
+	accent-color: var(--c-accent);
+	flex-shrink: 0;
+}
+.adm .check-title {
+	font-weight: 600;
+}
+.adm .grid-2 {
+	display: grid;
+	gap: 1rem;
+}
+@media (min-width: 640px) {
+	.adm .grid-2 {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+}
+.adm .grid-3 {
+	display: grid;
+	gap: 1rem;
+}
+@media (min-width: 640px) {
+	.adm .grid-3 {
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+	}
+}
+.adm .stack {
+	display: flex;
+	flex-direction: column;
+	gap: 1.1rem;
+}
+
+/* Segmentierte Auswahl (Radio-Buttons als Knopfleiste) */
+.adm .segmented {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.35rem;
+}
+.adm .segmented label {
+	position: relative;
+}
+.adm .segmented input {
+	position: absolute;
+	opacity: 0;
+	inset: 0;
+	cursor: pointer;
+}
+.adm .segmented span {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.4rem;
+	height: 2.4rem;
+	padding: 0 0.9rem;
+	border-radius: var(--radius-field);
+	border: 1px solid var(--c-line-strong);
+	background: var(--c-surface);
+	font-weight: 600;
+	cursor: pointer;
+}
+.adm .segmented input:checked + span {
+	background: var(--c-ink);
+	border-color: var(--c-ink);
+	color: #fff;
+}
+:root[data-theme='dark'] .adm .segmented input:checked + span {
+	background: var(--c-ink);
+	color: var(--c-bg);
+}
+@media (prefers-color-scheme: dark) {
+	:root:not([data-theme='light']) .adm .segmented input:checked + span {
+		background: var(--c-ink);
+		color: var(--c-bg);
+	}
+}
+.adm .segmented input:focus-visible + span {
+	outline: 2.5px solid var(--c-focus);
+	outline-offset: 2px;
+}
+
+/* ---------------- Meldungen */
+.adm .alert {
+	display: flex;
+	gap: 0.6rem;
+	align-items: flex-start;
+	padding: 0.75rem 1rem;
+	border-radius: var(--radius-field);
+	font-size: 0.9rem;
+	line-height: 1.45;
+}
+.adm .alert-error {
+	background: var(--c-danger-soft);
+	color: var(--c-danger);
+}
+.adm .alert-ok {
+	background: var(--c-ok-soft);
+	color: var(--c-ok);
+}
+.adm .alert-info {
+	background: var(--c-info-soft);
+	color: var(--c-info);
+}
+.adm .alert-warn {
+	background: var(--c-warn-soft);
+	color: var(--c-warn);
+}
+
+/* ---------------- Tabellen / Listen */
+.adm .table {
+	width: 100%;
+	border-collapse: collapse;
+}
+.adm .table th {
+	padding: 0.6rem 1rem;
+	text-align: left;
+	font-size: 0.8rem;
+	font-weight: 650;
+	color: var(--c-ink-3);
+	border-bottom: 1px solid var(--c-line);
+	white-space: nowrap;
+}
+.adm .table td {
+	padding: 0.75rem 1rem;
+	border-bottom: 1px solid var(--c-line);
+	vertical-align: middle;
+}
+.adm .table tr:last-child td {
+	border-bottom: 0;
+}
+.adm .table tbody tr:hover {
+	background: var(--c-surface-2);
+}
+.adm .row-link {
+	color: var(--c-ink);
+	font-weight: 650;
+	text-decoration: none;
+}
+.adm .row-link:hover {
+	color: var(--c-accent);
+	text-decoration: underline;
+}
+.adm .muted {
+	color: var(--c-ink-3);
+}
+.adm .small {
+	font-size: 0.85rem;
+}
+.adm .badge {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.3rem;
+	height: 1.5rem;
+	padding: 0 0.5rem;
+	border-radius: 999px;
+	font-size: 0.75rem;
+	font-weight: 700;
+	white-space: nowrap;
+	background: var(--c-surface-3);
+	color: var(--c-ink-2);
+}
+.adm .badge-ok {
+	background: var(--c-ok-soft);
+	color: var(--c-ok);
+}
+.adm .badge-warn {
+	background: var(--c-warn-soft);
+	color: var(--c-warn);
+}
+.adm .badge-red {
+	background: var(--c-danger-soft);
+	color: var(--c-danger);
+}
+.adm .badge-info {
+	background: var(--c-info-soft);
+	color: var(--c-info);
+}
+.adm .empty {
+	padding: 2.5rem 1rem;
+	text-align: center;
+	color: var(--c-ink-3);
+}
+.adm .toolbar {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 0.6rem;
+	margin-bottom: 1rem;
+}
+.adm .toolbar .input,
+.adm .toolbar .select {
+	width: auto;
+	min-width: 10rem;
+}
+.adm .toolbar .grow {
+	flex: 1 1 14rem;
+}
+
+/* Aktionsleiste unten in Formularen – bleibt beim Scrollen sichtbar */
+.adm .actionbar {
+	position: sticky;
+	bottom: 0;
+	z-index: 10;
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 0.6rem;
+	margin-top: 1.5rem;
+	padding: 0.85rem 0;
+	background: color-mix(in srgb, var(--c-bg) 92%, transparent);
+	backdrop-filter: blur(6px);
+	border-top: 1px solid var(--c-line);
+}
+.adm .actionbar .spacer {
+	flex: 1;
+}
+
+/* ---------------- Dialoge */
+.adm .modal-bg {
+	position: fixed;
+	inset: 0;
+	z-index: 50;
+	background: var(--c-scrim);
+}
+.adm .modal {
+	position: fixed;
+	z-index: 51;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	width: min(36rem, calc(100vw - 2rem));
+	max-height: calc(100dvh - 2rem);
+	overflow-y: auto;
+	box-shadow: var(--shadow-modal);
+}

@@ -1,0 +1,50 @@
+# Backyardboys Design – Webshop und interner Bereich
+# Stack für Portainer mit Cloudflare Tunnel (kein offener Port, HTTPS macht Cloudflare)
+#
+# Portainer → Stacks → Add stack → Web editor: diesen Inhalt einfügen und unten bei
+# „Environment variables“ setzen:
+#   SHOP_URL                https://shop.backyardboys.at
+#   ADMIN_URL               https://admin.backyardboys.at
+#   TUNNEL_TOKEN            Token des Cloudflare-Tunnels (siehe unten)
+#   APP_SECRET              langer Zufallswert, verschlüsselt Stripe/PayPal/SMTP-Zugangsdaten
+#                           (z. B. mit „openssl rand -base64 32“ erzeugen, gut aufbewahren)
+#   INITIAL_ADMIN_USERNAME  optional, Standard „admin“
+#   INITIAL_ADMIN_PASSWORD  optional – leer lassen: wird erzeugt und einmalig im Log angezeigt
+#
+# Cloudflare: Zero Trust → Networks → Tunnels → Tunnel anlegen → Token kopieren.
+# Beim Tunnel unter „Public Hostnames“ BEIDE Adressen auf denselben Dienst zeigen lassen:
+#   shop.backyardboys.at   →  HTTP  app:3000
+#   admin.backyardboys.at  →  HTTP  app:3000
+# Der Shop erkennt an der Adresse, ob Shop oder interner Bereich gemeint ist.
+#
+# Neue Version einspielen: Stack → Editor → „Update the stack“ mit „Re-pull image and redeploy“
+# (oder automatisch per Webhook, siehe README).
+
+services:
+  app:
+    image: ghcr.io/backyardboys-design/byb-webshop:latest
+    restart: unless-stopped
+    environment:
+      SHOP_URL: ${SHOP_URL}
+      ADMIN_URL: ${ADMIN_URL}
+      APP_SECRET: ${APP_SECRET:-}
+      # Cloudflare liefert HTTPS und die echte Besucher-IP (für die Sperre bei falschen Passwörtern)
+      PROTOCOL_HEADER: x-forwarded-proto
+      ADDRESS_HEADER: CF-Connecting-IP
+      INITIAL_ADMIN_USERNAME: ${INITIAL_ADMIN_USERNAME:-admin}
+      INITIAL_ADMIN_PASSWORD: ${INITIAL_ADMIN_PASSWORD:-}
+    volumes:
+      # Datenbank, Bilder, Kunden-Dateien und Sicherungen. Beim Entfernen des Stacks das Volume NICHT mitlöschen.
+      - byb-data:/data
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    restart: unless-stopped
+    command: tunnel --no-autoupdate run
+    environment:
+      TUNNEL_TOKEN: ${TUNNEL_TOKEN}
+    depends_on:
+      - app
+
+volumes:
+  byb-data:

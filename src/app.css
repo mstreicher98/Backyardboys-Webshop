@@ -1,0 +1,294 @@
+@import 'tailwindcss';
+@import '@fontsource-variable/saira/wdth.css';
+
+/* Dark Mode im Admin: folgt dem Attribut, ohne Attribut dem System */
+@custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));
+
+/* ------------------------------------------------------------ Tokens
+   Admin: helle, ruhige Arbeitsfläche in Zink-Tönen, Akzent Schwarz (hell)
+   bzw. Weiß (dunkel) – wie die Knöpfe im Shop.
+   Shop: reines Schwarz, Zink-Grau, Weiß. Farbe kommt aus den Produktbildern;
+   der einzige Akzent ist der Holo-Verlauf, angelehnt an die Holographic-Finishes. */
+:root {
+	color-scheme: light;
+	--c-accent: #18181b;
+	--c-accent-deep: #000000;
+	--c-accent-soft: #ececef;
+	--c-bg: #ffffff;
+	--c-surface: #ffffff;
+	--c-surface-2: #f6f6f7;
+	--c-surface-3: #ececef;
+	--c-line: #e1e1e5;
+	--c-line-strong: #c9c9cf;
+	--c-ink: #18181b;
+	--c-ink-2: #45454d;
+	--c-ink-3: #6c6c75;
+	--c-ok: #12784a;
+	--c-ok-soft: #e2f3ea;
+	--c-warn: #9a5400;
+	--c-warn-soft: #fdf0dc;
+	--c-danger: #b3261e;
+	--c-danger-soft: #fbe8e6;
+	--c-info: #1f5fa8;
+	--c-info-soft: #e6eef8;
+	--c-focus: #2563eb;
+	--c-scrim: rgb(9 9 11 / 0.5);
+	--shadow-1: 0 1px 2px rgb(24 24 27 / 0.06), 0 0 0 1px rgb(24 24 27 / 0.04);
+	--shadow-2: 0 10px 30px -12px rgb(24 24 27 / 0.25), 0 2px 6px rgb(24 24 27 / 0.06);
+	--shadow-3: 0 30px 70px -20px rgb(9 9 11 / 0.45), 0 4px 12px rgb(9 9 11 / 0.08);
+
+	--holo: linear-gradient(100deg, #7dd3fc 0%, #a78bfa 22%, #f0abfc 42%, #fda4af 58%, #fde68a 76%, #86efac 90%, #7dd3fc 100%);
+}
+
+@media (prefers-color-scheme: dark) {
+	:root:not([data-theme='light']) {
+		color-scheme: dark;
+		--c-accent: #fafafa;
+		--c-accent-deep: #ffffff;
+		--c-accent-soft: rgb(250 250 250 / 0.1);
+		--c-bg: #09090b;
+		--c-surface: #141417;
+		--c-surface-2: #1b1b1f;
+		--c-surface-3: #26262b;
+		--c-line: #2a2a30;
+		--c-line-strong: #3d3d45;
+		--c-ink: #f4f4f5;
+		--c-ink-2: #c4c4cc;
+		--c-ink-3: #9a9aa4;
+		--c-ok: #5bc893;
+		--c-ok-soft: rgb(91 200 147 / 0.13);
+		--c-warn: #f1ac55;
+		--c-warn-soft: rgb(241 172 85 / 0.13);
+		--c-danger: #f28b82;
+		--c-danger-soft: rgb(242 139 130 / 0.13);
+		--c-info: #8ab8f0;
+		--c-info-soft: rgb(138 184 240 / 0.13);
+		--c-focus: #8ab8f0;
+		--c-scrim: rgb(0 0 0 / 0.6);
+		--shadow-1: 0 0 0 1px rgb(255 255 255 / 0.03);
+		--shadow-2: 0 10px 30px -10px rgb(0 0 0 / 0.6);
+		--shadow-3: 0 30px 70px -20px rgb(0 0 0 / 0.75);
+	}
+}
+
+:root[data-theme='dark'] {
+	color-scheme: dark;
+	--c-accent: #fafafa;
+	--c-accent-deep: #ffffff;
+	--c-accent-soft: rgb(250 250 250 / 0.1);
+	--c-bg: #09090b;
+	--c-surface: #141417;
+	--c-surface-2: #1b1b1f;
+	--c-surface-3: #26262b;
+	--c-line: #2a2a30;
+	--c-line-strong: #3d3d45;
+	--c-ink: #f4f4f5;
+	--c-ink-2: #c4c4cc;
+	--c-ink-3: #9a9aa4;
+	--c-ok: #5bc893;
+	--c-ok-soft: rgb(91 200 147 / 0.13);
+	--c-warn: #f1ac55;
+	--c-warn-soft: rgb(241 172 85 / 0.13);
+	--c-danger: #f28b82;
+	--c-danger-soft: rgb(242 139 130 / 0.13);
+	--c-info: #8ab8f0;
+	--c-info-soft: rgb(138 184 240 / 0.13);
+	--c-focus: #8ab8f0;
+	--c-scrim: rgb(0 0 0 / 0.6);
+	--shadow-1: 0 0 0 1px rgb(255 255 255 / 0.03);
+	--shadow-2: 0 10px 30px -10px rgb(0 0 0 / 0.6);
+	--shadow-3: 0 30px 70px -20px rgb(0 0 0 / 0.75);
+}
+
+@theme {
+	--font-sans: 'Saira Variable', ui-sans-serif, system-ui, 'Segoe UI', sans-serif;
+
+	--radius-card: 12px;
+	--radius-field: 8px;
+
+	--ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+	--ease-in: cubic-bezier(0.55, 0, 1, 0.45);
+
+	--shadow-card: var(--shadow-1);
+	--shadow-pop: var(--shadow-2);
+	--shadow-modal: var(--shadow-3);
+}
+
+/* ------------------------------------------------------------ Basis */
+
+@layer base {
+	html {
+		-webkit-text-size-adjust: 100%;
+		text-rendering: optimizeLegibility;
+		scroll-padding-top: 6rem;
+	}
+	body {
+		background: var(--c-bg);
+		color: var(--c-ink);
+		font-family: var(--font-sans);
+		font-size: 1rem;
+		line-height: 1.6;
+		-webkit-font-smoothing: antialiased;
+		-moz-osx-font-smoothing: grayscale;
+	}
+	:focus-visible {
+		outline: 2.5px solid var(--c-focus);
+		outline-offset: 2px;
+		border-radius: 3px;
+	}
+	button,
+	[role='button'] {
+		cursor: pointer;
+	}
+	button:disabled {
+		cursor: not-allowed;
+	}
+	img {
+		max-width: 100%;
+	}
+}
+
+@utility tabular {
+	font-variant-numeric: tabular-nums;
+}
+@utility wrap {
+	width: 100%;
+	max-width: 82rem;
+	margin-inline: auto;
+	padding-inline: 1rem;
+	@media (min-width: 640px) {
+		padding-inline: 1.5rem;
+	}
+	@media (min-width: 1024px) {
+		padding-inline: 2.25rem;
+	}
+}
+
+/* ------------------------------------------------------------ Fließtext aus dem Editor */
+
+.prose {
+	--prose-gap: 1.05em;
+	--prose-accent: var(--c-ink);
+	font-size: 1.0625rem;
+	line-height: 1.7;
+	max-width: 68ch;
+}
+.prose > * + * {
+	margin-top: var(--prose-gap);
+}
+.prose h2 {
+	margin-top: 2em;
+	font-size: 1.45rem;
+	line-height: 1.15;
+	font-weight: 750;
+	font-stretch: 112%;
+	text-transform: uppercase;
+	letter-spacing: 0.01em;
+}
+.prose h3 {
+	margin-top: 1.6em;
+	font-size: 1.15rem;
+	line-height: 1.25;
+	font-weight: 700;
+}
+.prose h4 {
+	margin-top: 1.4em;
+	font-size: 1.05rem;
+	font-weight: 700;
+}
+.prose h2 + *,
+.prose h3 + *,
+.prose h4 + * {
+	margin-top: 0.5em;
+}
+.prose strong {
+	font-weight: 650;
+}
+.prose a {
+	color: var(--prose-accent);
+	font-weight: 550;
+	text-decoration: underline;
+	text-decoration-thickness: 1px;
+	text-underline-offset: 3px;
+}
+.prose a:hover {
+	text-decoration-thickness: 2px;
+}
+.prose ul,
+.prose ol {
+	padding-left: 1.3em;
+}
+.prose ul {
+	list-style: none;
+}
+.prose ul > li {
+	position: relative;
+}
+.prose ul > li::before {
+	content: '';
+	position: absolute;
+	left: -1.05em;
+	top: 0.7em;
+	width: 0.5em;
+	height: 0.2em;
+	background: currentColor;
+	transform: skewX(-20deg);
+}
+.prose ol {
+	list-style: decimal;
+}
+.prose ol > li::marker {
+	font-weight: 650;
+}
+.prose li + li {
+	margin-top: 0.35em;
+}
+.prose blockquote {
+	border-left: 3px solid currentColor;
+	padding-left: 1em;
+}
+.prose hr {
+	border: 0;
+	border-top: 1px solid var(--c-line);
+	margin-block: 2em;
+}
+.prose img {
+	width: auto;
+	height: auto;
+	max-height: min(48rem, 85svh);
+}
+.prose table {
+	width: 100%;
+	border-collapse: collapse;
+	font-size: 0.95em;
+}
+.prose th,
+.prose td {
+	text-align: left;
+	padding: 0.55em 0.75em 0.55em 0;
+	border-bottom: 1px solid var(--c-line);
+}
+.prose th {
+	font-weight: 650;
+}
+.prose mark {
+	background: #fde68a;
+	color: #000;
+	padding: 0 0.2em;
+}
+.prose > :first-child {
+	margin-top: 0;
+}
+
+/* ------------------------------------------------------------ Bewegung */
+
+@media (prefers-reduced-motion: reduce) {
+	*,
+	*::before,
+	*::after {
+		animation-duration: 0.01ms !important;
+		animation-iteration-count: 1 !important;
+		transition-duration: 0.01ms !important;
+		scroll-behavior: auto !important;
+	}
+}
