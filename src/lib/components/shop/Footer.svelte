@@ -84,8 +84,7 @@
 	}
 	.stripe {
 		height: 3px;
-		background: var(--holo);
-		opacity: 0.85;
+		background: var(--grad);
 	}
 	.grid {
 		display: grid;
@@ -124,6 +123,7 @@
 		color: #a1a1aa;
 		text-decoration: none;
 		font-size: 0.925rem;
+		transition: color 180ms;
 	}
 	a:hover {
 		color: #fff;

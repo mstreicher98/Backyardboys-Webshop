@@ -11,9 +11,10 @@
    der einzige Akzent ist der Holo-Verlauf, angelehnt an die Holographic-Finishes. */
 :root {
 	color-scheme: light;
-	--c-accent: #18181b;
-	--c-accent-deep: #000000;
-	--c-accent-soft: #ececef;
+	--c-accent: #7950f2;
+	--c-accent-deep: #6741d9;
+	--c-accent-soft: #f3f0ff;
+	--c-accent-ink: #6741d9;
 	--c-bg: #ffffff;
 	--c-surface: #ffffff;
 	--c-surface-2: #f6f6f7;
@@ -31,21 +32,27 @@
 	--c-danger-soft: #fbe8e6;
 	--c-info: #1f5fa8;
 	--c-info-soft: #e6eef8;
-	--c-focus: #2563eb;
+	--c-focus: #7950f2;
 	--c-scrim: rgb(9 9 11 / 0.5);
 	--shadow-1: 0 1px 2px rgb(24 24 27 / 0.06), 0 0 0 1px rgb(24 24 27 / 0.04);
 	--shadow-2: 0 10px 30px -12px rgb(24 24 27 / 0.25), 0 2px 6px rgb(24 24 27 / 0.06);
 	--shadow-3: 0 30px 70px -20px rgb(9 9 11 / 0.45), 0 4px 12px rgb(9 9 11 / 0.08);
 
-	--holo: linear-gradient(100deg, #7dd3fc 0%, #a78bfa 22%, #f0abfc 42%, #fda4af 58%, #fde68a 76%, #86efac 90%, #7dd3fc 100%);
+	--violet: #7950f2;
+	--orchid: #be4bdb;
+	--grad: linear-gradient(115deg, #7950f2 0%, #be4bdb 100%);
+	/* doppelt so breit, damit sich der Verlauf beim Überfahren verschieben lässt */
+	--grad-flow: linear-gradient(115deg, #7950f2 0%, #be4bdb 50%, #7950f2 100%);
+	--glow: 0 12px 32px -12px rgb(121 80 242 / 0.75), 0 6px 18px -10px rgb(190 75 219 / 0.6);
 }
 
 @media (prefers-color-scheme: dark) {
 	:root:not([data-theme='light']) {
 		color-scheme: dark;
-		--c-accent: #fafafa;
-		--c-accent-deep: #ffffff;
-		--c-accent-soft: rgb(250 250 250 / 0.1);
+		--c-accent: #7950f2;
+		--c-accent-deep: #6741d9;
+		--c-accent-soft: rgb(151 117 250 / 0.14);
+		--c-accent-ink: #b197fc;
 		--c-bg: #09090b;
 		--c-surface: #141417;
 		--c-surface-2: #1b1b1f;
@@ -63,7 +70,7 @@
 		--c-danger-soft: rgb(242 139 130 / 0.13);
 		--c-info: #8ab8f0;
 		--c-info-soft: rgb(138 184 240 / 0.13);
-		--c-focus: #8ab8f0;
+		--c-focus: #b197fc;
 		--c-scrim: rgb(0 0 0 / 0.6);
 		--shadow-1: 0 0 0 1px rgb(255 255 255 / 0.03);
 		--shadow-2: 0 10px 30px -10px rgb(0 0 0 / 0.6);
@@ -73,9 +80,10 @@
 
 :root[data-theme='dark'] {
 	color-scheme: dark;
-	--c-accent: #fafafa;
-	--c-accent-deep: #ffffff;
-	--c-accent-soft: rgb(250 250 250 / 0.1);
+	--c-accent: #7950f2;
+	--c-accent-deep: #6741d9;
+	--c-accent-soft: rgb(151 117 250 / 0.14);
+	--c-accent-ink: #b197fc;
 	--c-bg: #09090b;
 	--c-surface: #141417;
 	--c-surface-2: #1b1b1f;
@@ -93,7 +101,7 @@
 	--c-danger-soft: rgb(242 139 130 / 0.13);
 	--c-info: #8ab8f0;
 	--c-info-soft: rgb(138 184 240 / 0.13);
-	--c-focus: #8ab8f0;
+	--c-focus: #b197fc;
 	--c-scrim: rgb(0 0 0 / 0.6);
 	--shadow-1: 0 0 0 1px rgb(255 255 255 / 0.03);
 	--shadow-2: 0 10px 30px -10px rgb(0 0 0 / 0.6);

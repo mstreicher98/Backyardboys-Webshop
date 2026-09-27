@@ -8,7 +8,10 @@
 	import UserRound from '@lucide/svelte/icons/user-round';
 	import X from '@lucide/svelte/icons/x';
 	import Bike from '@lucide/svelte/icons/bike';
+	import { fade, fly, slide } from 'svelte/transition';
+	import { cubicIn, expoOut } from 'svelte/easing';
 	import { getI18n, switchLocalePath } from '$lib/i18n.svelte';
+	import { dur } from '$lib/motion';
 	import type { CategoryNode } from '$lib/server/shop/catalog';
 	import Picture from './Picture.svelte';
 
@@ -51,9 +54,23 @@
 	function focusSearch(node: HTMLInputElement) {
 		node.focus();
 	}
+
+	// Beim Scrollen: halbtransparent mit Unschärfe; nach unten weg, nach oben wieder da
+	let scrolled = $state(false);
+	let tucked = $state(false);
+	let lastY = 0;
+	function onScroll() {
+		const y = window.scrollY;
+		scrolled = y > 8;
+		if (open !== null || searching || y < 320) tucked = false;
+		else if (y > lastY + 8) tucked = true;
+		else if (y < lastY - 8) tucked = false;
+		lastY = y;
+	}
 </script>
 
 <svelte:window
+	onscroll={onScroll}
 	onkeydown={(e) => {
 		if (e.key === 'Escape') {
 			open = null;
@@ -63,7 +80,7 @@
 	}}
 />
 
-<header class="head">
+<header class="head" class:scrolled class:tucked onfocusin={() => (tucked = false)}>
 	<div class="bar wrap">
 		<button type="button" class="icon-btn only-mobile" aria-label={i.tr('Menü öffnen', 'Open menu')} onclick={() => (drawer = true)}><Menu size={24} /></button>
 
@@ -96,13 +113,13 @@
 			<a href={i.href('/konto')} class="icon-btn" aria-label={loggedIn ? i.tr('Mein Konto', 'My account') : i.tr('Anmelden', 'Log in')}><UserRound size={22} /></a>
 			<button type="button" class="icon-btn cart" aria-label={i.tr(`Warenkorb, ${cartCount} Artikel`, `Cart, ${cartCount} items`)} onclick={onCart}>
 				<ShoppingBag size={22} />
-				{#if cartCount > 0}<span class="count">{cartCount > 99 ? '99+' : cartCount}</span>{/if}
+				{#if cartCount > 0}{#key cartCount}<span class="count">{cartCount > 99 ? '99+' : cartCount}</span>{/key}{/if}
 			</button>
 		</div>
 	</div>
 
 	{#if searching}
-		<form class="search wrap" action={i.href('/produkte')} method="GET" role="search">
+		<form class="search wrap" out:fade={{ duration: dur(120) }} action={i.href('/produkte')} method="GET" role="search">
 			<Search size={20} />
 			<input use:focusSearch name="q" type="search" placeholder={i.tr('Dekor, Shirt, Modell …', 'Graphics, shirt, model …')} aria-label={i.tr('Suchbegriff', 'Search term')} />
 			<button class="btn btn-sm">{i.tr('Suchen', 'Search')}</button>
@@ -110,7 +127,8 @@
 	{/if}
 
 	{#if current}
-		<div id="mega" class="mega only-desktop" role="presentation" onmouseenter={() => enter(current.id)} onmouseleave={leave}>
+		<div id="mega" class="mega only-desktop" role="presentation" onmouseenter={() => enter(current.id)} onmouseleave={leave} out:fade={{ duration: dur(140) }}>
+			{#key current.id}
 			<div class="mega-in wrap">
 				<a class="mega-hero slant" href={i.href(`/kategorie/${current.slug}`)}>
 					{#if current.image}<Picture media={current.image} sizes="40vw" want={1200} alt="" />{/if}
@@ -121,8 +139,8 @@
 				</a>
 				<div class="mega-list">
 					{#if current.tagline}<p class="mega-tag">{current.tagline}</p>{/if}
-					{#each current.children as child (child.id)}
-						<a class="mega-row" href={i.href(`/kategorie/${child.slug}`)}>
+					{#each current.children as child, n (child.id)}
+						<a class="mega-row" style="--i: {n}" href={i.href(`/kategorie/${child.slug}`)}>
 							<span class="thumb slant">{#if child.image}<Picture media={child.image} sizes="160px" want={400} alt="" />{/if}</span>
 							<span>
 								{#if child.tagline}<span class="row-tag">{child.tagline}</span>{/if}
@@ -132,13 +150,14 @@
 					{/each}
 				</div>
 			</div>
+			{/key}
 		</div>
 	{/if}
 </header>
 
 {#if drawer}
-	<div class="scrim" onclick={() => (drawer = false)} aria-hidden="true"></div>
-	<div class="drawer" role="dialog" aria-modal="true" aria-label={i.tr('Menü', 'Menu')}>
+	<div class="scrim" onclick={() => (drawer = false)} aria-hidden="true" out:fade={{ duration: dur(220) }}></div>
+	<div class="drawer" role="dialog" out:fly={{ x: -380, duration: dur(260), easing: cubicIn, opacity: 1 }} aria-modal="true" aria-label={i.tr('Menü', 'Menu')}>
 		<div class="drawer-head">
 			<img src="/bilder/logo.webp" alt="Backyardboys Design" width="600" height="254" />
 			<!-- svelte-ignore a11y_autofocus -->
@@ -148,15 +167,15 @@
 			<input class="input" name="q" type="search" placeholder={i.tr('Suchen …', 'Search …')} aria-label={i.tr('Suchbegriff', 'Search term')} />
 		</form>
 		<ul class="drawer-nav">
-			{#each menu as item (item.id)}
-				<li>
+			{#each menu as item, n (item.id)}
+				<li style="--i: {n}">
 					{#if item.children.length}
 						<button type="button" class="d-link" aria-expanded={expanded === item.id} onclick={() => (expanded = expanded === item.id ? null : item.id)}>
 							{item.name}
 							<ChevronDown size={18} />
 						</button>
 						{#if expanded === item.id}
-							<ul class="d-sub">
+							<ul class="d-sub" transition:slide={{ duration: dur(280), easing: expoOut }}>
 								<li><a href={i.href(`/kategorie/${item.slug}`)}>{i.tr('Alle', 'All')} {item.name}</a></li>
 								{#each item.children as child (child.id)}
 									<li><a href={i.href(`/kategorie/${child.slug}`)}>{child.name}</a></li>
@@ -168,10 +187,10 @@
 					{/if}
 				</li>
 			{/each}
-			<li><a class="d-link" href={i.href('/bike-finder')}><span><Bike size={18} /> {bike ? bike.label : i.tr('Bike-Finder', 'Bike finder')}</span></a></li>
-			<li><a class="d-link" href={i.href('/konto')}>{loggedIn ? i.tr('Mein Konto', 'My account') : i.tr('Anmelden', 'Log in')}</a></li>
-			<li><a class="d-link" href={i.href('/kontakt')}>{i.tr('Kontakt', 'Contact')}</a></li>
-			<li><a class="d-link" href={switchHref} hreflang={other} lang={other}>{other === 'en' ? 'English' : 'Deutsch'}</a></li>
+			<li style="--i: {menu.length}"><a class="d-link" href={i.href('/bike-finder')}><span><Bike size={18} /> {bike ? bike.label : i.tr('Bike-Finder', 'Bike finder')}</span></a></li>
+			<li style="--i: {menu.length + 1}"><a class="d-link" href={i.href('/konto')}>{loggedIn ? i.tr('Mein Konto', 'My account') : i.tr('Anmelden', 'Log in')}</a></li>
+			<li style="--i: {menu.length + 2}"><a class="d-link" href={i.href('/kontakt')}>{i.tr('Kontakt', 'Contact')}</a></li>
+			<li style="--i: {menu.length + 3}"><a class="d-link" href={switchHref} hreflang={other} lang={other}>{other === 'en' ? 'English' : 'Deutsch'}</a></li>
 		</ul>
 	</div>
 {/if}
@@ -183,6 +202,20 @@
 		z-index: 40;
 		background: #000;
 		border-bottom: 1px solid #18181b;
+		view-transition-name: site-header;
+		transition:
+			transform 420ms var(--ease-expo),
+			background-color 300ms,
+			border-color 300ms;
+	}
+	.head.scrolled {
+		background: rgb(0 0 0 / 0.7);
+		border-bottom-color: rgb(255 255 255 / 0.07);
+		-webkit-backdrop-filter: blur(18px) saturate(1.6);
+		backdrop-filter: blur(18px) saturate(1.6);
+	}
+	.head.tucked {
+		transform: translateY(-100%);
 	}
 	.bar {
 		display: flex;
@@ -193,6 +226,10 @@
 	.logo {
 		display: block;
 		flex-shrink: 0;
+		transition: opacity 200ms;
+	}
+	.logo:hover {
+		opacity: 0.8;
 	}
 	.logo img {
 		height: 2.35rem;
@@ -220,6 +257,7 @@
 		display: flex;
 	}
 	.nav-link {
+		position: relative;
 		display: inline-flex;
 		align-items: center;
 		gap: 0.3rem;
@@ -233,9 +271,28 @@
 		text-transform: uppercase;
 		text-decoration: none;
 	}
-	.nav-link:hover,
-	.nav-link[aria-expanded='true'] {
-		color: #a1a1aa;
+	/* Verlaufs-Strich an der Unterkante, wächst von links */
+	.nav-link::after {
+		content: '';
+		position: absolute;
+		left: 0.65rem;
+		right: 0.65rem;
+		bottom: -1px;
+		height: 2px;
+		background: var(--grad);
+		transform: scaleX(0);
+		transform-origin: left;
+		transition: transform 380ms var(--ease-expo);
+	}
+	.nav-link:hover::after,
+	.nav-link[aria-expanded='true']::after {
+		transform: none;
+	}
+	.nav-link :global(svg) {
+		transition: transform 300ms var(--ease-expo);
+	}
+	.nav-link[aria-expanded='true'] :global(svg) {
+		transform: rotate(180deg);
 	}
 	.tools {
 		display: flex;
@@ -278,8 +335,11 @@
 			padding: 0 0.9rem;
 		}
 	}
+	.bike {
+		transition: border-color 200ms;
+	}
 	.bike:hover {
-		border-color: #fff;
+		border-color: #9775fa;
 	}
 	.lang {
 		display: inline-grid;
@@ -306,12 +366,19 @@
 		height: 1.15rem;
 		padding: 0 0.25rem;
 		border-radius: 999px;
-		background: var(--holo);
-		color: #000;
+		background: var(--grad);
+		color: #fff;
+		box-shadow: 0 0 0 2px #000;
+		animation: pop 460ms var(--ease-spring);
 		font-size: 0.68rem;
 		font-weight: 800;
 		line-height: 1.15rem;
 		text-align: center;
+	}
+	@keyframes pop {
+		from {
+			transform: scale(0.3);
+		}
 	}
 	.only-desktop {
 		display: none;
@@ -331,6 +398,13 @@
 		padding-block: 0.9rem;
 		border-top: 1px solid #18181b;
 		color: #a1a1aa;
+		animation: search-in 360ms var(--ease-expo);
+	}
+	@keyframes search-in {
+		from {
+			opacity: 0;
+			transform: translateY(-0.5rem);
+		}
 	}
 	.search input {
 		flex: 1;
@@ -344,7 +418,7 @@
 	}
 	.search input:focus {
 		outline: none;
-		border-bottom-color: #fff;
+		border-bottom-color: #9775fa;
 	}
 
 	/* Mega-Menü */
@@ -355,12 +429,15 @@
 		top: 100%;
 		background: #000;
 		border-bottom: 1px solid #27272a;
-		animation: drop 160ms var(--ease-out);
+		box-shadow: 0 40px 80px -30px rgb(0 0 0 / 0.9);
+		animation: drop 420ms var(--ease-expo);
 	}
 	@keyframes drop {
 		from {
-			opacity: 0;
-			transform: translateY(-6px);
+			clip-path: inset(0 0 100% 0);
+		}
+		to {
+			clip-path: inset(0 0 -6rem 0);
 		}
 	}
 	.mega-in {
@@ -383,6 +460,17 @@
 		width: 100%;
 		height: 100%;
 		object-fit: cover;
+		animation: settle 900ms var(--ease-expo) both;
+		transition: transform 700ms var(--ease-expo);
+	}
+	.mega-hero:hover :global(img) {
+		transform: scale(1.04);
+	}
+	@keyframes settle {
+		from {
+			opacity: 0;
+			scale: 1.1;
+		}
 	}
 	.mega-hero::after {
 		content: '';
@@ -416,10 +504,27 @@
 		background: #0f0f11;
 		color: #fff;
 		text-decoration: none;
-		transition: background-color 120ms;
+		transition:
+			background-color 200ms,
+			transform 300ms var(--ease-expo);
+		animation: row-in 520ms var(--ease-expo) both;
+		animation-delay: calc(70ms + var(--i, 0) * 45ms);
 	}
 	.mega-row:hover {
 		background: #18181b;
+		transform: translateX(0.35rem);
+	}
+	@keyframes row-in {
+		from {
+			opacity: 0;
+			transform: translateX(-1.25rem);
+		}
+	}
+	.mega-row .thumb :global(img) {
+		transition: transform 600ms var(--ease-expo);
+	}
+	.mega-row:hover .thumb :global(img) {
+		transform: scale(1.08);
 	}
 	.thumb {
 		--cut: 1.1rem;
@@ -455,6 +560,14 @@
 		inset: 0;
 		z-index: 60;
 		background: rgb(0 0 0 / 0.7);
+		-webkit-backdrop-filter: blur(4px);
+		backdrop-filter: blur(4px);
+		animation: fade-in 240ms var(--ease-out);
+	}
+	@keyframes fade-in {
+		from {
+			opacity: 0;
+		}
 	}
 	.drawer {
 		position: fixed;
@@ -464,10 +577,11 @@
 		left: 0;
 		width: min(22rem, 88vw);
 		overflow-y: auto;
+		overflow-x: hidden;
 		background: #000;
 		border-right: 1px solid #27272a;
 		padding: 0.75rem 1rem 2rem;
-		animation: slide 200ms var(--ease-out);
+		animation: slide 420ms var(--ease-expo);
 	}
 	@keyframes slide {
 		from {
@@ -489,6 +603,14 @@
 	}
 	.drawer-nav > li {
 		border-bottom: 1px solid #18181b;
+		animation: row-in 560ms var(--ease-expo) both;
+		animation-delay: calc(120ms + var(--i, 0) * 40ms);
+	}
+	.d-link :global(svg) {
+		transition: transform 300ms var(--ease-expo);
+	}
+	.d-link[aria-expanded='true'] :global(svg) {
+		transform: rotate(180deg);
 	}
 	.d-link {
 		display: flex;

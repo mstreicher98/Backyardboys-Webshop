@@ -37,7 +37,7 @@
 			<label class="field"><span class="label">{i.tr('E-Mail', 'Email')}</span><input class="input" name="email" type="email" autocomplete="email" required value={form?.email ?? ''} /></label>
 			<label class="field"><span class="label">{i.tr('Passwort', 'Password')}</span><input class="input" name="passwort" type="password" autocomplete="current-password" required /></label>
 			<label class="check"><input type="checkbox" name="merken" /><span>{i.tr('Angemeldet bleiben', 'Keep me logged in')}</span></label>
-			<button class="btn" disabled={busy}>{i.tr('Anmelden', 'Log in')}</button>
+			<button class="btn" aria-busy={busy} disabled={busy}>{i.tr('Anmelden', 'Log in')}</button>
 			<a class="link small" href={i.href('/konto/passwort-vergessen')}>{i.tr('Passwort vergessen?', 'Forgot password?')}</a>
 		</form>
 	{:else}
@@ -48,7 +48,7 @@
 			{#if form?.linkError}<p class="alert alert-error" role="alert">{form.linkError}</p>{/if}
 			<p class="muted small">{i.tr('Kein Passwort nötig: Wir schicken dir einen Link, mit dem du direkt angemeldet bist. Funktioniert auch, wenn du bisher nur ohne Konto bestellt hast.', "No password needed: we'll send you a link that logs you in. Also works if you've only ordered without an account so far.")}</p>
 			<label class="field"><span class="label">{i.tr('E-Mail', 'Email')}</span><input class="input" name="email" type="email" autocomplete="email" required value={form?.email ?? ''} /></label>
-			<button class="btn" disabled={busy}>{i.tr('Link schicken', 'Send link')}</button>
+			<button class="btn" aria-busy={busy} disabled={busy}>{i.tr('Link schicken', 'Send link')}</button>
 		</form>
 	{/if}
 

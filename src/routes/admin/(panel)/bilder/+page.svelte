@@ -226,7 +226,7 @@
 	}
 	.doc :global(svg) {
 		flex-shrink: 0;
-		color: var(--c-accent);
+		color: var(--c-accent-ink);
 	}
 	.doc-name {
 		flex: 1;

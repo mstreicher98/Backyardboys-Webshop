@@ -61,7 +61,7 @@
 		height: 3rem;
 		border-radius: 12px;
 		background: var(--c-accent-soft);
-		color: var(--c-accent);
+		color: var(--c-accent-ink);
 	}
 	.title {
 		margin-top: 1rem;

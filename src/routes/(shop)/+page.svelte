@@ -5,6 +5,7 @@
 	import ProductCard from '$lib/components/shop/ProductCard.svelte';
 	import Seo from '$lib/components/shop/Seo.svelte';
 	import { getI18n } from '$lib/i18n.svelte';
+	import { reveal } from '$lib/motion';
 
 	let { data } = $props();
 	const i = getI18n();
@@ -22,17 +23,21 @@
 
 <section class="hero">
 	<div class="hero-img slant">
-		{#if data.hero.image}
-			<Picture media={data.hero.image} sizes="(min-width: 1024px) 60vw, 100vw" want={1600} eager alt="" />
-		{:else}
-			<img src="/bilder/hero.webp" alt="" width="1600" height="1600" fetchpriority="high" />
-		{/if}
+		<div class="hero-media">
+			{#if data.hero.image}
+				<Picture media={data.hero.image} sizes="(min-width: 1024px) 60vw, 100vw" want={1600} eager alt="" />
+			{:else}
+				<img src="/bilder/hero.webp" alt="" width="1600" height="1600" fetchpriority="high" />
+			{/if}
+		</div>
+		<!-- Verlaufs-Streifen legt das Bild frei – wie beim Aufziehen eines Dekors -->
+		<span class="sweep" aria-hidden="true"></span>
 	</div>
 	<div class="hero-text wrap">
 		<h1 class="display">
-			{#each heroLines as line, n (n)}<span>{line}</span>{/each}
+			{#each heroLines as line, n (n)}<span class="line" style="--i: {n}"><span>{line}</span></span>{/each}
 		</h1>
-		<span class="holo-bar" aria-hidden="true"></span>
+		<span class="grad-bar" aria-hidden="true"></span>
 		<p class="lead">{data.hero.text}</p>
 		<div class="ctas">
 			<a class="btn" href={i.href('/kategorie/bike-designs')}>{i.tr('Dekore entdecken', 'Explore graphics')}</a>
@@ -55,7 +60,7 @@
 {/if}
 
 {#if data.categories.length}
-	<section class="wrap section cats">
+	<section class="wrap section cats" use:reveal={{ group: true, variant: 'cut', stagger: 130 }}>
 		{#each data.categories as c (c.id)}
 			<a class="cat" href={i.href(`/kategorie/${c.slug}`)}>
 				<span class="cat-img slant">{#if c.image}<Picture media={c.image} sizes="(min-width: 1024px) 33vw, 100vw" want={1200} alt="" />{/if}</span>
@@ -74,19 +79,19 @@
 			<h2 class="display h2">{i.tr('Aus der Werkstatt', 'Fresh from the shop')}</h2>
 			<a class="link" href={i.href('/produkte')}>{i.tr('Alle Produkte', 'All products')}</a>
 		</div>
-		<div class="grid">
+		<div class="grid" use:reveal={{ group: true }}>
 			{#each data.featured as p, n (p.id)}<ProductCard {p} eager={n < 4} />{/each}
 		</div>
 	</section>
 {/if}
 
-<section class="custom">
+<section class="custom on-light">
 	<div class="wrap custom-in">
 		<div>
 			<h2 class="display h2">{i.tr('Full Custom: so läuft’s', 'Full custom: how it works')}</h2>
 			<p class="lead">{i.tr('Du hast eine Idee, wir machen daraus dein Dekor.', 'You bring the idea, we turn it into your graphics.')}</p>
 		</div>
-		<ol class="steps">
+		<ol class="steps" use:reveal={{ group: true, stagger: 120 }}>
 			<li>
 				<strong>{i.tr('Anfrage & Anzahlung', 'Request & deposit')}</strong>
 				<span>{i.tr('Bike, Farben und Wünsche angeben, Fotos hochladen, Anzahlung leisten.', 'Tell us your bike, colours and wishes, upload photos, pay the deposit.')}</span>
@@ -113,7 +118,7 @@
 		<div class="sec-head">
 			<h2 class="display h2">{i.tr('Neu im Shop', 'New in')}</h2>
 		</div>
-		<div class="grid">
+		<div class="grid" use:reveal={{ group: true }}>
 			{#each data.newest as p (p.id)}<ProductCard {p} />{/each}
 		</div>
 	</section>
@@ -124,7 +129,7 @@
 		<div class="wrap sec-head">
 			<h2 class="display h2">{i.tr('Kundenbikes', 'Customer bikes')}</h2>
 		</div>
-		<ul class="gallery" aria-label={i.tr('Kundenbikes', 'Customer bikes')}>
+		<ul class="gallery" use:reveal={{ group: true, variant: 'cut', stagger: 110 }} aria-label={i.tr('Kundenbikes', 'Customer bikes')}>
 			{#each data.gallery as g (g.id)}
 				<li>
 					<figure>
@@ -140,7 +145,7 @@
 {#if data.reviews.length}
 	<section class="wrap section">
 		<h2 class="display h2">{i.tr('Das sagen Fahrer', 'What riders say')}</h2>
-		<div class="reviews">
+		<div class="reviews" use:reveal={{ group: true, stagger: 110 }}>
 			{#each data.reviews as r (r.id)}
 				<figure class="review">
 					<span class="stars" aria-label={i.tr(`${r.rating} von 5 Sternen`, `${r.rating} out of 5 stars`)}>
@@ -167,15 +172,67 @@
 		inset: 0;
 		background: #18181b;
 	}
+	/* Einstieg: ein abgestimmter Ablauf – Bild wird freigewischt, Zeilen steigen auf, Strich zieht sich, Knöpfe folgen */
+	.hero-media {
+		position: absolute;
+		inset: 0;
+		animation: wipe 1300ms var(--ease-expo) 100ms both;
+	}
 	.hero-img :global(img) {
 		width: 100%;
 		height: 100%;
 		object-fit: cover;
 		object-position: 60% 45%;
+		animation: settle 2400ms var(--ease-expo) 100ms both;
+	}
+	@keyframes wipe {
+		from {
+			clip-path: polygon(-12% 0, 0 0, -12% 100%, -12% 100%);
+		}
+		to {
+			clip-path: polygon(-12% 0, 112% 0, 100% 100%, -12% 100%);
+		}
+	}
+	@keyframes settle {
+		from {
+			transform: scale(1.14);
+		}
+	}
+	/* Mitte des Streifens läuft genau auf der Wischkante (gleiche Kurve und Dauer) */
+	.sweep {
+		position: absolute;
+		z-index: 2;
+		top: -5%;
+		bottom: -5%;
+		left: 0;
+		width: 14%;
+		background: var(--grad);
+		pointer-events: none;
+		animation:
+			sweep-move 1300ms var(--ease-expo) 100ms both,
+			sweep-fade 1300ms linear 100ms both;
+	}
+	@keyframes sweep-move {
+		from {
+			transform: translateX(-93%) skewX(-12deg);
+		}
+		to {
+			transform: translateX(707%) skewX(-12deg);
+		}
+	}
+	@keyframes sweep-fade {
+		0%,
+		55% {
+			opacity: 1;
+		}
+		100% {
+			opacity: 0;
+		}
 	}
 	.hero-img::after {
 		content: '';
 		position: absolute;
+		z-index: 1;
 		inset: 0;
 		background:
 			linear-gradient(to top, #000 0%, rgb(0 0 0 / 0.72) 45%, rgb(0 0 0 / 0.35) 75%, rgb(0 0 0 / 0.15) 100%),
@@ -206,23 +263,57 @@
 		font-size: clamp(2.4rem, 1.2rem + 5.8vw, 5.6rem);
 		max-width: 11ch;
 	}
-	h1 span + span {
+	.line + .line {
 		margin-top: 0.06em;
 	}
-	.holo-bar {
+	/* Maske je Zeile; Innenabstand, damit Umlaute und Unterlängen nicht abgeschnitten werden */
+	.line {
+		display: block;
+		overflow: hidden;
+		padding: 0.12em 0.1em 0.04em 0;
+		margin: -0.12em -0.1em -0.04em 0;
+	}
+	.line > span {
+		display: block;
+		animation: rise 1100ms var(--ease-expo) both;
+		animation-delay: calc(420ms + var(--i) * 110ms);
+	}
+	@keyframes rise {
+		from {
+			transform: translateY(110%);
+		}
+	}
+	.grad-bar {
 		display: block;
 		width: 7rem;
 		height: 0.4rem;
 		margin: 1.5rem 0 1.25rem;
-		background: var(--holo);
+		background: var(--grad);
 		transform: skewX(-24deg);
 		transform-origin: left;
+		box-shadow: var(--glow);
+		animation: draw 900ms var(--ease-expo) 800ms both;
+	}
+	@keyframes draw {
+		from {
+			transform: skewX(-24deg) scaleX(0);
+		}
+	}
+	.hero-text .lead {
+		animation: fade-up 900ms var(--ease-expo) 900ms both;
 	}
 	.ctas {
 		display: flex;
 		flex-wrap: wrap;
 		gap: 0.75rem;
 		margin-top: 1.75rem;
+		animation: fade-up 900ms var(--ease-expo) 1020ms both;
+	}
+	@keyframes fade-up {
+		from {
+			opacity: 0;
+			transform: translateY(1rem);
+		}
 	}
 
 	.finder {
@@ -267,10 +358,10 @@
 		width: 100%;
 		height: 100%;
 		object-fit: cover;
-		transition: transform 500ms var(--ease-out);
+		transition: transform 900ms var(--ease-expo);
 	}
 	.cat:hover .cat-img :global(img) {
-		transform: scale(1.03);
+		transform: scale(1.05);
 	}
 	.cat-img::after {
 		content: '';
@@ -288,6 +379,21 @@
 	}
 	.cat-name {
 		font-size: clamp(1.5rem, 1rem + 1.6vw, 2.25rem);
+	}
+	/* Kurzer Verlaufs-Strich wie im Titelbereich, zieht sich beim Überfahren */
+	.cat-text::after {
+		content: '';
+		width: 3.5rem;
+		height: 0.3rem;
+		margin-top: 0.7rem;
+		background: var(--grad);
+		transform: skewX(-24deg) scaleX(0.35);
+		transform-origin: left;
+		transition: transform 500ms var(--ease-expo);
+	}
+	.cat:hover .cat-text::after,
+	.cat:focus-visible .cat-text::after {
+		transform: skewX(-24deg);
 	}
 
 	.sec-head {
@@ -335,12 +441,7 @@
 		margin-top: 0.75rem;
 	}
 	.custom .btn {
-		background: #000;
-		color: #fff;
 		justify-self: start;
-	}
-	.custom .btn:hover {
-		background: #27272a;
 	}
 	.steps {
 		display: grid;
@@ -353,19 +454,43 @@
 		}
 	}
 	.steps li {
+		position: relative;
 		counter-increment: step;
 		display: flex;
 		flex-direction: column;
 		gap: 0.25rem;
-		padding-top: 0.9rem;
-		border-top: 2px solid #000;
+		padding-top: 1rem;
+		border-top: 2px solid #e4e4e7;
+	}
+	/* Verlaufs-Linie zieht sich über die graue Linie, sobald der Schritt ins Bild kommt */
+	.steps li::after {
+		content: '';
+		position: absolute;
+		top: -2px;
+		left: 0;
+		right: 0;
+		height: 2px;
+		background: var(--grad);
+		transform-origin: left;
+	}
+	.steps li:global(.rv)::after {
+		transform: scaleX(0);
+		transition: transform 1200ms var(--ease-expo) calc(var(--rv-delay, 0ms) + 250ms);
+	}
+	.steps li:global(.rv-in)::after {
+		transform: none;
 	}
 	.steps li::before {
 		content: counter(step);
-		font-size: 2rem;
+		width: fit-content;
+		font-size: 2.4rem;
 		font-weight: 850;
 		font-stretch: 125%;
 		line-height: 1;
+		background: var(--grad);
+		-webkit-background-clip: text;
+		background-clip: text;
+		color: transparent;
 	}
 	.steps strong {
 		font-weight: 750;
@@ -392,6 +517,9 @@
 	.gallery li {
 		flex: 0 0 min(80vw, 26rem);
 		scroll-snap-align: start;
+	}
+	.gallery figure {
+		overflow: hidden;
 	}
 	.gallery figure :global(img) {
 		width: 100%;
@@ -424,7 +552,7 @@
 	.stars {
 		display: flex;
 		gap: 0.15rem;
-		color: #fff;
+		color: #cc5de8;
 	}
 	blockquote {
 		color: #d4d4d8;

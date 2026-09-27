@@ -1,6 +1,9 @@
 <script lang="ts">
 	import X from '@lucide/svelte/icons/x';
+	import { fade, fly } from 'svelte/transition';
+	import { cubicIn } from 'svelte/easing';
 	import { getI18n } from '$lib/i18n.svelte';
+	import { dur } from '$lib/motion';
 	import type { MediaRef } from '$lib/media';
 	import Picture from './Picture.svelte';
 
@@ -27,8 +30,8 @@
 </script>
 
 {#if open}
-	<div class="scrim" onclick={onClose} aria-hidden="true"></div>
-	<div class="panel-r" role="dialog" aria-modal="true" aria-label={i.tr('Warenkorb', 'Cart')}>
+	<div class="scrim" onclick={onClose} aria-hidden="true" out:fade={{ duration: dur(240) }}></div>
+	<div class="panel-r" role="dialog" out:fly={{ x: 440, duration: dur(280), easing: cubicIn, opacity: 1 }} aria-modal="true" aria-label={i.tr('Warenkorb', 'Cart')}>
 		<div class="top">
 			<h2 class="h3">{i.tr('Warenkorb', 'Cart')}</h2>
 			<!-- svelte-ignore a11y_autofocus -->
@@ -36,8 +39,8 @@
 		</div>
 		{#if lines.length}
 			<ul class="lines">
-				{#each lines as l (l.id)}
-					<li>
+				{#each lines as l, n (l.id)}
+					<li style="--i: {n}">
 						<a href={i.href(`/produkt/${l.slug}`)} class="img" onclick={onClose}>
 							{#if l.image}<Picture media={l.image} sizes="96px" want={400} alt="" />{/if}
 						</a>
@@ -73,6 +76,14 @@
 		inset: 0;
 		z-index: 60;
 		background: rgb(0 0 0 / 0.7);
+		-webkit-backdrop-filter: blur(4px);
+		backdrop-filter: blur(4px);
+		animation: fade-in 260ms var(--ease-out);
+	}
+	@keyframes fade-in {
+		from {
+			opacity: 0;
+		}
 	}
 	.panel-r {
 		position: fixed;
@@ -85,7 +96,8 @@
 		flex-direction: column;
 		background: #0c0c0e;
 		border-left: 1px solid #27272a;
-		animation: slide 220ms var(--ease-out);
+		box-shadow: -40px 0 80px -20px rgb(0 0 0 / 0.8);
+		animation: slide 480ms var(--ease-expo);
 	}
 	@keyframes slide {
 		from {
@@ -102,6 +114,7 @@
 	.lines {
 		flex: 1;
 		overflow-y: auto;
+		overflow-x: hidden;
 		padding: 0.5rem 1.25rem;
 	}
 	.lines li {
@@ -109,6 +122,14 @@
 		gap: 0.9rem;
 		padding-block: 0.9rem;
 		border-bottom: 1px solid #18181b;
+		animation: line-in 600ms var(--ease-expo) both;
+		animation-delay: calc(140ms + var(--i, 0) * 55ms);
+	}
+	@keyframes line-in {
+		from {
+			opacity: 0;
+			transform: translateX(2rem);
+		}
 	}
 	.img {
 		flex-shrink: 0;
@@ -132,6 +153,10 @@
 		font-weight: 700;
 		text-decoration: none;
 		line-height: 1.3;
+		transition: color 160ms;
+	}
+	.t:hover {
+		color: var(--s-accent);
 	}
 	.sum {
 		display: flex;
@@ -139,6 +164,7 @@
 		gap: 0.6rem;
 		padding: 1.25rem;
 		border-top: 1px solid #27272a;
+		animation: line-in 600ms var(--ease-expo) 220ms both;
 	}
 	.row {
 		display: flex;
@@ -151,5 +177,6 @@
 		align-items: flex-start;
 		gap: 1rem;
 		padding: 1.5rem 1.25rem;
+		animation: line-in 600ms var(--ease-expo) 140ms both;
 	}
 </style>

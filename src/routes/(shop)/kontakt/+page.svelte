@@ -56,7 +56,7 @@
 				<input type="checkbox" name="datenschutz" required />
 				<span class="small">{i.tr('Ich bin einverstanden, dass meine Angaben zur Beantwortung gespeichert werden. Mehr in der', 'I agree that my details are stored to answer my request. More in the')} <a class="link" href={i.href('/info/datenschutz')} target="_blank">{i.tr('Datenschutzerklärung', 'privacy policy')}</a>.</span>
 			</label>
-			<button class="btn" disabled={busy}>{i.tr('Anfrage senden', 'Send request')}</button>
+			<button class="btn" aria-busy={busy} disabled={busy}>{i.tr('Anfrage senden', 'Send request')}</button>
 		</form>
 	{/if}
 </div>

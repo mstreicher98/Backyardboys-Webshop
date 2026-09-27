@@ -57,6 +57,22 @@
 		height: 100%;
 		object-fit: cover;
 		opacity: 0.55;
+		animation: settle 1800ms var(--ease-expo) both;
+	}
+	@keyframes settle {
+		from {
+			opacity: 0;
+			transform: scale(1.1);
+		}
+	}
+	.in {
+		animation: fade-up 900ms var(--ease-expo) 120ms both;
+	}
+	@keyframes fade-up {
+		from {
+			opacity: 0;
+			transform: translateY(1rem);
+		}
 	}
 	.bg::after {
 		content: '';
@@ -92,10 +108,15 @@
 		text-decoration: none;
 		box-shadow: inset 0 0 0 1px #52525b;
 		background: rgb(0 0 0 / 0.4);
+		-webkit-backdrop-filter: blur(8px);
+		backdrop-filter: blur(8px);
+		transition:
+			box-shadow 220ms,
+			background-color 220ms;
 	}
 	.subs a:hover {
-		background: #fff;
-		color: #000;
+		background: rgb(121 80 242 / 0.25);
+		box-shadow: inset 0 0 0 1px #9775fa;
 	}
 	.desc {
 		margin-bottom: 2rem;

@@ -299,7 +299,7 @@
 	.bar span {
 		display: block;
 		height: 100%;
-		background: var(--c-accent);
+		background: var(--grad);
 		transition: width 150ms;
 	}
 	.search {
@@ -356,7 +356,7 @@
 		width: 1.6rem;
 		height: 1.6rem;
 		border-radius: 999px;
-		background: var(--c-accent);
+		background: var(--grad);
 		color: #fff;
 	}
 	.doclist {
@@ -383,7 +383,7 @@
 	}
 	.doc :global(svg) {
 		flex-shrink: 0;
-		color: var(--c-accent);
+		color: var(--c-accent-ink);
 	}
 	.doc-name {
 		flex: 1;

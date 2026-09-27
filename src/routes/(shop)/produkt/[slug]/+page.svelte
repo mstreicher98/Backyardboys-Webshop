@@ -10,6 +10,8 @@
 	import Seo from '$lib/components/shop/Seo.svelte';
 	import { cartUi } from '$lib/cart-ui.svelte';
 	import { getI18n } from '$lib/i18n.svelte';
+	import { fade } from 'svelte/transition';
+	import { dur, reveal } from '$lib/motion';
 	import { mediaSrc } from '$lib/media';
 	import type { UploadedFile } from '$lib/shop-types';
 	import { htmlText } from '$lib/text';
@@ -95,7 +97,11 @@
 		<div class="gallery">
 			<div class="main-img">
 				{#if data.images[shown]}
-					<Picture media={data.images[shown]} sizes="(min-width: 1024px) 55vw, 100vw" want={1600} eager />
+					{#key shown}
+						<div class="frame" in:fade={{ duration: dur(380) }}>
+							<Picture media={data.images[shown]} sizes="(min-width: 1024px) 55vw, 100vw" want={1600} eager />
+						</div>
+					{/key}
 				{:else}
 					<span class="ph" aria-hidden="true">BYB</span>
 				{/if}
@@ -117,7 +123,7 @@
 
 			<div class="price-block">
 				{#if isDeposit}<span class="price-label">{i.tr('Anzahlung', 'Deposit')}</span>{/if}
-				<span class="price tabular">{i.money(unit * (fixedQty ? 1 : 1))}</span>
+				{#key unit}<span class="price tabular">{i.money(unit)}</span>{/key}
 				{#if variant?.compareAt && variant.compareAt > variant.price}<s class="muted">{i.money(variant.compareAt + surcharges)}</s>{/if}
 				{#if data.dealer}<span class="badge">{i.tr('Händlerpreis', 'Dealer price')}</span>{/if}
 			</div>
@@ -183,7 +189,7 @@
 						<legend class="label">{g.name}</legend>
 						<div class="swatches">
 							{#each g.options as o (o.id)}
-								<label class="swatch" class:holo-ring={upgrades[g.id] === o.id}>
+								<label class="swatch" class:ring-accent={upgrades[g.id] === o.id}>
 									<input type="radio" name="upgrades[{g.id}]" value={o.id} bind:group={upgrades[g.id]} />
 									<span class="sw-img">{#if o.image}<Picture media={o.image} sizes="140px" want={400} alt="" />{/if}</span>
 									<span class="sw-name">{o.name}</span>
@@ -266,7 +272,7 @@
 					{:else}
 						<input type="hidden" name="menge" value="1" />
 					{/if}
-					<button class="btn add" disabled={busy || soldOut || p.status !== 'aktiv'}>
+					<button class="btn add" aria-busy={busy} disabled={busy || soldOut || p.status !== 'aktiv'}>
 						{#if soldOut}
 							{i.tr('Ausverkauft', 'Sold out')}
 						{:else if busy}
@@ -314,7 +320,7 @@
 	{#if data.related.length}
 		<section class="section">
 			<h2 class="display h2">{i.tr('Passt dazu', 'You might also like')}</h2>
-			<div class="related">
+			<div class="related" use:reveal={{ group: true }}>
 				{#each data.related as r (r.id)}<ProductCard p={r} />{/each}
 			</div>
 		</section>
@@ -347,6 +353,10 @@
 		overflow: hidden;
 		clip-path: polygon(0 0, 100% 0, 100% calc(100% - 2.5rem), calc(100% - 2.5rem) 100%, 0 100%);
 	}
+	.frame {
+		position: absolute;
+		inset: 0;
+	}
 	.main-img :global(img) {
 		width: 100%;
 		height: 100%;
@@ -375,10 +385,14 @@
 		overflow: hidden;
 		opacity: 0.55;
 		box-shadow: inset 0 0 0 2px transparent;
+		transition: opacity 200ms;
+	}
+	.thumb:hover {
+		opacity: 0.85;
 	}
 	.thumb[aria-pressed='true'] {
 		opacity: 1;
-		outline: 2px solid #fff;
+		outline: 2px solid #9775fa;
 		outline-offset: -2px;
 	}
 	.thumb :global(img) {
@@ -406,9 +420,18 @@
 		color: #a1a1aa;
 	}
 	.price {
+		display: inline-block;
 		font-size: 1.9rem;
 		font-weight: 800;
 		font-stretch: 110%;
+		animation: tick 420ms var(--ease-expo);
+	}
+	/* Preis rollt beim Ändern der Auswahl kurz nach */
+	@keyframes tick {
+		from {
+			opacity: 0.2;
+			transform: translateY(-0.35em);
+		}
 	}
 	.facts {
 		display: flex;
@@ -421,7 +444,8 @@
 		margin-top: 1.5rem;
 		padding: 1.1rem 1.25rem;
 		background: #18181b;
-		border-left: 3px solid #fff;
+		border-left: 3px solid;
+		border-image: var(--grad) 1;
 	}
 	.deposit ol {
 		margin-top: 0.5rem;
@@ -465,9 +489,16 @@
 		background: #18181b;
 		cursor: pointer;
 		box-shadow: inset 0 0 0 1px #27272a;
+		transition:
+			box-shadow 200ms,
+			transform 300ms var(--ease-expo);
 	}
 	.swatch:hover {
 		box-shadow: inset 0 0 0 1px #71717a;
+		transform: translateY(-2px);
+	}
+	.swatch:active {
+		transform: scale(0.97);
 	}
 	.swatch input {
 		position: absolute;
@@ -487,6 +518,10 @@
 		width: 100%;
 		height: 100%;
 		object-fit: cover;
+		transition: transform 700ms var(--ease-expo);
+	}
+	.swatch:hover .sw-img :global(img) {
+		transform: scale(1.08);
 	}
 	.sw-name {
 		font-size: 0.85rem;
@@ -506,8 +541,15 @@
 		width: 1.4rem;
 		height: 1.4rem;
 		border-radius: 999px;
-		background: #fff;
-		color: #000;
+		background: var(--grad);
+		color: #fff;
+		box-shadow: 0 0 0 2px #18181b;
+		animation: pop 460ms var(--ease-spring);
+	}
+	@keyframes pop {
+		from {
+			transform: scale(0.2);
+		}
 	}
 	.buy {
 		display: flex;
@@ -526,6 +568,10 @@
 		width: 2.6rem;
 		font-size: 1.2rem;
 		color: #fff;
+		transition: background-color 160ms;
+	}
+	.qty:focus-within {
+		box-shadow: inset 0 0 0 1px #9775fa;
 	}
 	.qty button:hover {
 		background: #18181b;

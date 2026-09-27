@@ -98,8 +98,8 @@
 		text-decoration: none;
 	}
 	.years a[aria-current='page'] {
-		background: var(--c-accent);
-		color: var(--c-bg);
+		background: var(--grad);
+		color: #fff;
 	}
 	.kpis {
 		display: grid;
@@ -148,7 +148,7 @@
 		display: block;
 		height: 0.6rem;
 		border-radius: 0 4px 4px 0;
-		background: var(--c-accent);
+		background: var(--grad);
 		min-width: 2px;
 	}
 	.export {

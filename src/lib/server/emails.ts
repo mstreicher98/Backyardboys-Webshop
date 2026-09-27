@@ -26,9 +26,10 @@ function layout(s: ShopSettings, locale: Locale, heading: string, blocks: Block[
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#e4e4e7;padding:24px 12px"><tr><td align="center">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:600px;background:#ffffff">
 <tr><td style="background:#000000;padding:22px 28px" align="left"><img src="${shopBase()}/bilder/logo-mail.png" width="140" height="70" alt="${esc(c.brand)}" style="display:block;border:0"></td></tr>
+<tr><td style="height:4px;line-height:4px;font-size:0;background:#7950f2;background-image:linear-gradient(90deg,#7950f2,#be4bdb)">&nbsp;</td></tr>
 <tr><td style="padding:30px 28px 8px"><h1 style="margin:0 0 18px;font-size:24px;line-height:1.2;font-weight:800;text-transform:uppercase;letter-spacing:.01em">${esc(heading)}</h1>
 ${blocks.map((b) => b.html).join('\n')}
-${cta ? `<p style="margin:26px 0 8px"><a href="${esc(cta.url)}" style="display:inline-block;background:#000;color:#fff;text-decoration:none;font-weight:700;padding:14px 22px;text-transform:uppercase;font-size:14px;letter-spacing:.03em">${esc(cta.label)}</a></p>` : ''}
+${cta ? `<p style="margin:26px 0 8px"><a href="${esc(cta.url)}" style="display:inline-block;background:#7950f2;background-image:linear-gradient(115deg,#7950f2,#be4bdb);color:#fff;text-decoration:none;font-weight:700;padding:14px 22px;text-transform:uppercase;font-size:14px;letter-spacing:.03em">${esc(cta.label)}</a></p>` : ''}
 </td></tr>
 <tr><td style="padding:24px 28px 28px;font-size:12px;line-height:1.5;color:#71717a;border-top:1px solid #e4e4e7">${esc(footer)}</td></tr>
 </table></td></tr></table></body></html>`;
@@ -276,10 +277,10 @@ export async function giftCardMail(card: GiftCard, locale: Locale, buyerName: st
 			)
 		)
 	];
-	if (card.message) blocks.push(raw(`<blockquote style="margin:0 0 16px;padding:10px 16px;border-left:3px solid #000;font-style:italic;font-size:15px">${nl2br(card.message)}</blockquote>`, `„${card.message}“\n`));
+	if (card.message) blocks.push(raw(`<blockquote style="margin:0 0 16px;padding:10px 16px;border-left:3px solid #7950f2;font-style:italic;font-size:15px">${nl2br(card.message)}</blockquote>`, `„${card.message}“\n`));
 	blocks.push(
 		raw(
-			`<p style="margin:8px 0 16px;padding:18px;background:#000;color:#fff;font-size:24px;font-weight:800;letter-spacing:.12em;text-align:center">${esc(card.code)}</p>`,
+			`<p style="margin:8px 0 16px;padding:18px;background:#7950f2;background-image:linear-gradient(115deg,#7950f2,#be4bdb);color:#fff;font-size:24px;font-weight:800;letter-spacing:.12em;text-align:center">${esc(card.code)}</p>`,
 			`${L('Gutscheincode', 'Gift card code')}: ${card.code}\n`
 		),
 		p(L('Einfach an der Kasse eingeben. Nicht verbrauchte Beträge bleiben auf dem Gutschein.', 'Just enter it at checkout. Any unused amount stays on the card.'))

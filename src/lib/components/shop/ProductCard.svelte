@@ -57,17 +57,40 @@
 		width: 100%;
 		height: 100%;
 		object-fit: cover;
+		transition: transform 900ms var(--ease-expo);
 	}
 	.img2 {
 		position: absolute;
 		inset: 0;
 		opacity: 0;
-		transition: opacity 200ms;
+		transition: opacity 400ms var(--ease-out);
+	}
+	/* Verlaufs-Strich an der Unterkante, läuft in den Anschnitt */
+	.img::after {
+		content: '';
+		position: absolute;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		height: 3px;
+		background: var(--grad);
+		transform: scaleX(0);
+		transform-origin: left;
+		transition: transform 500ms var(--ease-expo);
 	}
 	@media (hover: hover) {
 		.card:hover .img2 {
 			opacity: 1;
 		}
+		.card:hover .img :global(img) {
+			transform: scale(1.05);
+		}
+		.card:hover .img::after {
+			transform: none;
+		}
+	}
+	.card:focus-visible {
+		outline-offset: 4px;
 	}
 	.ph {
 		position: absolute;
@@ -104,9 +127,11 @@
 		line-height: 1.2;
 		letter-spacing: 0.01em;
 	}
+	.title {
+		transition: color 200ms;
+	}
 	.card:hover .title {
-		text-decoration: underline;
-		text-underline-offset: 3px;
+		color: var(--s-accent);
 	}
 	.sub {
 		font-size: 0.875rem;

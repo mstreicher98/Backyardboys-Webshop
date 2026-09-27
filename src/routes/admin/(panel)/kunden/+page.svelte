@@ -70,8 +70,8 @@
 		text-decoration: none;
 	}
 	.filters a[aria-current='page'] {
-		background: var(--c-accent);
-		color: var(--c-bg);
+		background: var(--grad);
+		color: #fff;
 	}
 	.table-wrap {
 		overflow-x: auto;

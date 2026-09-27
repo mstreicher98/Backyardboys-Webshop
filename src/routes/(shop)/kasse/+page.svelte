@@ -285,7 +285,7 @@
 				</span>
 			</label>
 			{#if form?.error}<p class="alert alert-error" role="alert">{form.error}</p>{/if}
-			<button class="btn btn-block" disabled={busy || !shipAllowed || (totals.amountDue > 0 && !payList.length)}>
+			<button class="btn btn-block" aria-busy={busy} disabled={busy || !shipAllowed || (totals.amountDue > 0 && !payList.length)}>
 				{busy ? i.tr('Bestellung wird gesendet …', 'Placing order …') : i.tr('Zahlungspflichtig bestellen', 'Place order and pay')}
 			</button>
 		</aside>
@@ -354,14 +354,25 @@
 		box-shadow: inset 0 0 0 1px #27272a;
 		cursor: pointer;
 	}
+	.option {
+		transition:
+			box-shadow 220ms var(--ease-out),
+			background-color 220ms;
+	}
+	.option:hover {
+		box-shadow: inset 0 0 0 1px #52525b;
+	}
 	.option.on {
-		box-shadow: inset 0 0 0 2px #fff;
+		background: #1c1a24;
+		box-shadow:
+			inset 0 0 0 2px #9775fa,
+			0 14px 34px -22px rgb(121 80 242 / 0.9);
 	}
 	.option input {
 		width: 1.15rem;
 		height: 1.15rem;
 		margin-top: 0.2rem;
-		accent-color: #fff;
+		accent-color: #7950f2;
 	}
 	.option > span {
 		display: flex;
@@ -398,8 +409,8 @@
 		min-width: 1.3rem;
 		height: 1.3rem;
 		border-radius: 999px;
-		background: #fff;
-		color: #000;
+		background: var(--grad);
+		color: #fff;
 		font-size: 0.72rem;
 		font-weight: 800;
 		display: grid;

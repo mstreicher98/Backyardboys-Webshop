@@ -6,6 +6,9 @@
 	import Seo from '$lib/components/shop/Seo.svelte';
 	import Totals from '$lib/components/shop/Totals.svelte';
 	import { getI18n } from '$lib/i18n.svelte';
+	import { dur } from '$lib/motion';
+	import { slide } from 'svelte/transition';
+	import { cubicOut } from 'svelte/easing';
 
 	let { data, form } = $props();
 	const i = getI18n();
@@ -27,7 +30,7 @@
 		<div class="layout">
 			<ul class="lines">
 				{#each v.lines as l (l.id)}
-					<li class="line" class:problem={!!l.problem}>
+					<li class="line" class:problem={!!l.problem} out:slide={{ duration: dur(320), easing: cubicOut }}>
 						<a class="img" href={i.href(`/produkt/${l.slug}`)}>
 							{#if l.image}<Picture media={l.image} sizes="140px" want={400} alt="" />{/if}
 						</a>

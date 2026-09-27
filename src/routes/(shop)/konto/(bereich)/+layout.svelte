@@ -51,9 +51,13 @@
 		white-space: nowrap;
 		border-bottom: 3px solid transparent;
 		margin-bottom: -1px;
+		transition: color 180ms;
+	}
+	.tabs a:hover {
+		color: #fff;
 	}
 	.tabs a[aria-current='page'] {
 		color: #fff;
-		border-bottom-color: #fff;
+		border-image: var(--grad) 1;
 	}
 </style>

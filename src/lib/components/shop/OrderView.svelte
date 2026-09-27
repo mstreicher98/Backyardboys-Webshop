@@ -125,7 +125,7 @@
 						<input type="hidden" name="auftrag" value={job.id} />
 						<input type="hidden" name="entwurf" value={open.id} />
 						<p class="muted small">{i.tr('Bitte prüfe Schreibweisen, Nummern und Farben genau – mit der Freigabe geht das Design so in den Druck.', 'Please check spelling, numbers and colours carefully – once approved, the design goes to print as shown.')}</p>
-						<button class="btn" disabled={busy}>{i.tr('Entwurf freigeben', 'Approve design')}</button>
+						<button class="btn" aria-busy={busy} disabled={busy}>{i.tr('Entwurf freigeben', 'Approve design')}</button>
 					</form>
 					<form method="POST" use:enhance={done} class="change">
 						<input type="hidden" name="aktion" value="aendern" />
@@ -138,7 +138,7 @@
 						{#if job.type === 'full_custom'}
 							<p class="muted small">{i.tr(`Korrekturschleife ${Math.min(job.revisions + 1, v.maxRevisions)} von ${v.maxRevisions} inklusive.`, `Revision ${Math.min(job.revisions + 1, v.maxRevisions)} of ${v.maxRevisions} included.`)}</p>
 						{/if}
-						<button class="btn btn-ghost" disabled={busy}>{i.tr('Änderung anfragen', 'Request changes')}</button>
+						<button class="btn btn-ghost" aria-busy={busy} disabled={busy}>{i.tr('Änderung anfragen', 'Request changes')}</button>
 					</form>
 				</div>
 			</div>
@@ -255,7 +255,7 @@
 				<textarea class="textarea" name="text" maxlength="4000" required placeholder={i.tr('Deine Nachricht …', 'Your message …')}></textarea>
 			</label>
 			<FileField name="dateien" label={i.tr('Dateien anhängen (optional)', 'Attach files (optional)')} max={5} bind:files={msgFiles} />
-			<button class="btn btn-ghost" disabled={busy}>{i.tr('Nachricht senden', 'Send message')}</button>
+			<button class="btn btn-ghost" aria-busy={busy} disabled={busy}>{i.tr('Nachricht senden', 'Send message')}</button>
 		</form>
 	{/if}
 </section>
@@ -284,13 +284,33 @@
 		color: #71717a;
 	}
 	.progress li.done {
-		border-top-color: #fff;
+		border-image: var(--grad) 1;
+		color: #d4d4d8;
+	}
+	/* Aktueller Schritt: Verlauf mit durchlaufendem Lichtpunkt – hier passiert gerade etwas */
+	.progress li[aria-current='step'] {
+		position: relative;
+		border-image: var(--grad) 1;
 		color: #fff;
 	}
-	.progress li[aria-current='step'] {
-		border-image: var(--holo) 1;
-		border-top-width: 3px;
-		border-top-style: solid;
+	.progress li[aria-current='step']::before {
+		content: '';
+		position: absolute;
+		top: -3px;
+		left: 0;
+		right: 0;
+		height: 3px;
+		background: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.85), transparent) no-repeat;
+		background-size: 35% 100%;
+		animation: shimmer 2.4s var(--ease-out) infinite;
+	}
+	@keyframes shimmer {
+		from {
+			background-position: -60% 0;
+		}
+		to {
+			background-position: 160% 0;
+		}
 	}
 	.alert {
 		margin-bottom: 1.25rem;
@@ -483,12 +503,12 @@
 		margin-right: 3rem;
 	}
 	.thread li.team {
-		background: #fff;
-		color: #000;
+		background: var(--grad);
+		color: #fff;
 		margin: 0 0 0 3rem;
 	}
 	.thread li.team .who {
-		color: #52525b;
+		color: rgb(255 255 255 / 0.78);
 	}
 	.thread li.system {
 		background: transparent;

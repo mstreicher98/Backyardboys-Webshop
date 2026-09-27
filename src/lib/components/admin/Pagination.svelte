@@ -69,8 +69,8 @@
 		background: var(--c-surface-3);
 	}
 	.num[aria-current='page'] {
-		background: var(--c-accent);
-		color: var(--c-bg);
+		background: var(--grad);
+		color: #fff;
 	}
 	.gap {
 		min-width: 1.5rem;

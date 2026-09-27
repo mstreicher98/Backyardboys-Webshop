@@ -45,7 +45,7 @@
 				<input type="checkbox" name="datenschutz" required />
 				<span class="small">{i.tr('Ich habe die', 'I have read the')} <a class="link" href={i.href('/info/datenschutz')} target="_blank">{i.tr('Datenschutzerklärung', 'privacy policy')}</a> {i.tr('gelesen.', '.')}</span>
 			</label>
-			<button class="btn" disabled={busy}>{i.tr('Konto anlegen', 'Create account')}</button>
+			<button class="btn" aria-busy={busy} disabled={busy}>{i.tr('Konto anlegen', 'Create account')}</button>
 		</form>
 		<p class="more">{i.tr('Schon registriert?', 'Already registered?')} <a class="link" href={i.href('/konto/anmelden')}>{i.tr('Anmelden', 'Log in')}</a></p>
 	{/if}

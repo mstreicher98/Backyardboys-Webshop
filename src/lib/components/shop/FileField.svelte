@@ -164,7 +164,7 @@
 	}
 	.drop:hover,
 	.drop:focus-within {
-		border-color: #fff;
+		border-color: #9775fa;
 	}
 	.drop.invalid {
 		border-color: var(--s-danger);

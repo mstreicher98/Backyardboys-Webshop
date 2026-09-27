@@ -20,8 +20,10 @@
 		align-items: center;
 		justify-content: center;
 		padding: 2rem 1rem;
+		/* schwarzes Band mit Verlaufs-Kante, darunter die Arbeitsfläche */
 		background:
 			linear-gradient(to bottom, #000 0 13rem, transparent 13rem),
+			linear-gradient(115deg, #7950f2, #be4bdb) 0 13rem / 100% 3px no-repeat,
 			var(--c-bg);
 	}
 	.box {
@@ -32,6 +34,13 @@
 		background: var(--c-surface);
 		border: 1px solid var(--c-line);
 		box-shadow: var(--shadow-pop);
+		animation: rise 520ms cubic-bezier(0.16, 1, 0.3, 1);
+	}
+	@keyframes rise {
+		from {
+			opacity: 0;
+			transform: translateY(14px) scale(0.985);
+		}
 	}
 	.brand {
 		display: flex;

@@ -2,7 +2,11 @@
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
 	import X from '@lucide/svelte/icons/x';
+	import { flip } from 'svelte/animate';
+	import { expoOut } from 'svelte/easing';
+	import { fade } from 'svelte/transition';
 	import { getI18n } from '$lib/i18n.svelte';
+	import { dur, reveal } from '$lib/motion';
 	import type { ProductCard as Card } from '$lib/server/shop/catalog';
 	import ProductCard from './ProductCard.svelte';
 
@@ -55,8 +59,10 @@
 </div>
 
 {#if products.length}
-	<div class="grid">
-		{#each products as p, n (p.id)}<ProductCard {p} eager={n < 4} />{/each}
+	<div class="grid" use:reveal={{ group: true }}>
+		{#each products as p, n (p.id)}
+			<div animate:flip={{ duration: dur(550), easing: expoOut }} in:fade={{ duration: dur(300) }}><ProductCard {p} eager={n < 4} /></div>
+		{/each}
 	</div>
 	{#if pages > 1}
 		<nav class="pager" aria-label={i.tr('Seiten', 'Pages')}>
@@ -101,16 +107,23 @@
 		gap: 0.4rem;
 		height: 2.5rem;
 		padding: 0 0.9rem;
-		background: #fff;
-		color: #000;
+		background: var(--grad);
+		color: #fff;
 		font-size: 0.85rem;
 		font-weight: 700;
 		text-decoration: none;
+		transition: box-shadow 250ms;
+	}
+	.pill:hover {
+		box-shadow: var(--glow);
 	}
 	.pill.off {
 		background: transparent;
 		color: #fff;
 		box-shadow: inset 0 0 0 1px #3f3f46;
+	}
+	.pill.off:hover {
+		box-shadow: inset 0 0 0 1px #9775fa;
 	}
 	.sort .select {
 		min-height: 2.5rem;
@@ -149,10 +162,14 @@
 		text-decoration: none;
 		box-shadow: inset 0 0 0 1px #3f3f46;
 		font-weight: 650;
+		transition: box-shadow 200ms;
+	}
+	.pager a:hover {
+		box-shadow: inset 0 0 0 1px #9775fa;
 	}
 	.pager a[aria-current='page'] {
-		background: #fff;
-		color: #000;
+		background: var(--grad);
+		box-shadow: none;
 	}
 	.empty {
 		display: flex;

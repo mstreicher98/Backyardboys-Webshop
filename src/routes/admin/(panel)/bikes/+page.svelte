@@ -151,8 +151,8 @@
 		background: var(--c-surface-2);
 	}
 	.brands a[aria-current='page'] {
-		background: var(--c-accent);
-		color: var(--c-bg);
+		background: var(--grad);
+		color: #fff;
 	}
 	.head {
 		display: flex;

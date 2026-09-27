@@ -27,6 +27,9 @@
 	import X from '@lucide/svelte/icons/x';
 	import { can, ROLE_LABELS } from '$lib/permissions';
 	import { toasts } from '$lib/toast.svelte';
+	import { fade, fly } from 'svelte/transition';
+	import { cubicIn } from 'svelte/easing';
+	import { dur } from '$lib/motion';
 
 	let { data, children } = $props();
 
@@ -163,8 +166,8 @@
 	</header>
 
 	{#if drawer}
-		<div class="drawer-bg" onclick={() => (drawer = false)} aria-hidden="true"></div>
-		<div class="drawer" role="dialog" aria-modal="true" aria-label="Menü">
+		<div class="drawer-bg" onclick={() => (drawer = false)} aria-hidden="true" out:fade={{ duration: dur(200) }}></div>
+		<div class="drawer" role="dialog" out:fly={{ x: -320, duration: dur(240), easing: cubicIn, opacity: 1 }} aria-modal="true" aria-label="Menü">
 			<div class="drawer-head">
 				{@render brand()}
 				<!-- svelte-ignore a11y_autofocus -->
@@ -178,7 +181,7 @@
 	<main class="content">
 		<!-- Neu aufbauen, wenn sich die Adresse ändert – Formulare übernehmen sonst Werte der vorigen Seite -->
 		{#key path}
-			{@render children()}
+			<div class="page-in">{@render children()}</div>
 		{/key}
 	</main>
 </div>
@@ -279,13 +282,19 @@
 		font-size: 0.925rem;
 		text-decoration: none;
 	}
+	.nav a {
+		transition:
+			background-color 140ms,
+			color 140ms;
+	}
 	.nav a:hover {
 		background: var(--c-surface-2);
 		color: var(--c-ink);
 	}
 	.nav a[aria-current='page'] {
-		background: var(--c-accent);
-		color: var(--c-bg);
+		background: var(--grad);
+		color: #fff;
+		box-shadow: 0 8px 20px -12px rgb(121 80 242 / 0.8);
 	}
 	.nav-label {
 		flex: 1;
@@ -303,8 +312,8 @@
 		text-align: center;
 	}
 	.nav a[aria-current='page'] .nav-badge {
-		background: var(--c-bg);
-		color: var(--c-ink);
+		background: rgb(255 255 255 / 0.25);
+		color: #fff;
 	}
 	.user {
 		margin-top: auto;
@@ -418,6 +427,12 @@
 		inset: 0;
 		z-index: 50;
 		background: var(--c-scrim);
+		animation: fade-in 200ms var(--ease-out);
+	}
+	@keyframes fade-in {
+		from {
+			opacity: 0;
+		}
 	}
 	.drawer {
 		position: fixed;
@@ -432,7 +447,7 @@
 		background: var(--c-surface);
 		overflow-y: auto;
 		box-shadow: var(--shadow-modal);
-		animation: slide 180ms var(--ease-out);
+		animation: slide 380ms cubic-bezier(0.16, 1, 0.3, 1);
 	}
 	@keyframes slide {
 		from {

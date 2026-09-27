@@ -15,7 +15,7 @@
 	<p class="muted">{i.tr('Bestellung', 'Order')} {data.order.number}</p>
 	{#if data.state === 'bezahlt'}
 		<h1 class="display h1">{i.tr('Danke – bezahlt!', 'Thanks – paid!')}</h1>
-		<span class="holo-bar" aria-hidden="true"></span>
+		<span class="grad-bar" aria-hidden="true"></span>
 		<p class="lead">
 			{data.payment.purpose === 'restzahlung'
 				? i.tr('Deine Restzahlung ist angekommen. Dein Dekor geht jetzt in Produktion.', 'Your remaining payment has arrived. Your graphics are now going into production.')
@@ -79,7 +79,7 @@
 				{/each}
 			</fieldset>
 			{#if form?.error}<p class="alert alert-error">{form.error}</p>{/if}
-			<button class="btn" disabled={busy || !method}>
+			<button class="btn" aria-busy={busy} disabled={busy || !method}>
 				{method === 'ueberweisung' ? i.tr('Per Überweisung zahlen', 'Pay by bank transfer') : i.tr('Jetzt bezahlen', 'Pay now')}
 			</button>
 		</form>
@@ -91,12 +91,15 @@
 	.narrow {
 		max-width: 44rem;
 	}
-	.holo-bar {
+	.grad-bar {
 		display: block;
 		width: 6rem;
 		height: 0.35rem;
 		margin: 1.25rem 0;
-		background: var(--holo);
+		background: var(--grad);
+		box-shadow: var(--glow);
+		transform-origin: left;
+		animation: draw 900ms var(--ease-expo) 200ms both;
 		transform: skewX(-24deg);
 	}
 	.lead {
@@ -155,10 +158,26 @@
 		box-shadow: inset 0 0 0 1px #27272a;
 		cursor: pointer;
 	}
+	.option {
+		transition:
+			box-shadow 220ms var(--ease-out),
+			background-color 220ms;
+	}
+	.option:hover {
+		box-shadow: inset 0 0 0 1px #52525b;
+	}
 	.option.on {
-		box-shadow: inset 0 0 0 2px #fff;
+		background: #1c1a24;
+		box-shadow:
+			inset 0 0 0 2px #9775fa,
+			0 14px 34px -22px rgb(121 80 242 / 0.9);
 	}
 	.option input {
-		accent-color: #fff;
+		accent-color: #7950f2;
+	}
+	@keyframes draw {
+		from {
+			transform: skewX(-24deg) scaleX(0);
+		}
 	}
 </style>

@@ -113,7 +113,7 @@
 	}
 	.add:hover {
 		color: #fff;
-		border-color: #fff;
+		border-color: #9775fa;
 	}
 	.edit {
 		display: flex;

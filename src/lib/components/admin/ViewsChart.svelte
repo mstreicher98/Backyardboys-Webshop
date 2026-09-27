@@ -1,8 +1,9 @@
 <script lang="ts">
 	import { formatDayShort, formatNumber, weekdayShort } from '$lib/format';
 
-	/** Seitenaufrufe je Tag als Säulen – eine Reihe, Farbe = Feuerrot */
+	/** Seitenaufrufe je Tag als Säulen – eine Reihe im Akzentverlauf */
 	let { data }: { data: { day: string; n: number }[] } = $props();
+	const uid = $props.id();
 
 	let width = $state(600);
 	const height = 190;
@@ -45,12 +46,18 @@
 
 <div class="chart" bind:clientWidth={width}>
 	<svg {width} {height} role="img" aria-label="Seitenaufrufe der letzten {data.length} Tage" onpointermove={onMove} onpointerleave={() => (hover = null)}>
+		<defs>
+			<linearGradient id="{uid}-g" x1="0" y1="1" x2="0" y2="0">
+				<stop offset="0" stop-color="#7950f2" />
+				<stop offset="1" stop-color="#be4bdb" />
+			</linearGradient>
+		</defs>
 		{#each ticks as t (t)}
 			<line x1={pad.left} x2={width - pad.right} y1={y(t)} y2={y(t)} class="grid" />
 			<text x={pad.left - 8} y={y(t)} class="tick" text-anchor="end" dominant-baseline="middle">{formatNumber(t)}</text>
 		{/each}
 		{#each data as d, i (d.day)}
-			<path d={bar(i, d.n)} class="bar" class:dim={hover != null && hover !== i} />
+			<path d={bar(i, d.n)} class="bar" class:dim={hover != null && hover !== i} fill="url(#{uid}-g)" style="--i: {i}" />
 			{#if i === 0 || i === data.length - 1 || i % 7 === 0}
 				<text x={pad.left + i * slot + slot / 2} y={height - 6} class="tick" text-anchor="middle">{d.day.slice(8, 10)}.{d.day.slice(5, 7)}.</text>
 			{/if}
@@ -97,9 +104,18 @@
 		font-size: 11px;
 		font-variant-numeric: tabular-nums;
 	}
+	/* Säulen wachsen beim Laden nacheinander aus der Grundlinie */
 	.bar {
-		fill: var(--c-accent);
 		transition: opacity 120ms;
+		transform-box: fill-box;
+		transform-origin: bottom;
+		animation: grow 700ms var(--ease-out) both;
+		animation-delay: calc(var(--i) * 12ms);
+	}
+	@keyframes grow {
+		from {
+			transform: scaleY(0);
+		}
 	}
 	.bar.dim {
 		opacity: 0.35;

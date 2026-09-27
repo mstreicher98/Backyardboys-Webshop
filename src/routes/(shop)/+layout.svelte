@@ -1,12 +1,13 @@
 <script lang="ts">
 	import '$lib/shop.css';
-	import { afterNavigate } from '$app/navigation';
+	import { afterNavigate, onNavigate } from '$app/navigation';
 	import { page } from '$app/state';
 	import CartDrawer from '$lib/components/shop/CartDrawer.svelte';
 	import Footer from '$lib/components/shop/Footer.svelte';
 	import Header from '$lib/components/shop/Header.svelte';
 	import { cartUi } from '$lib/cart-ui.svelte';
 	import { I18n, setI18n } from '$lib/i18n.svelte';
+	import { prefersReducedMotion } from 'svelte/motion';
 
 	let { data, children } = $props();
 
@@ -20,6 +21,18 @@
 	afterNavigate(({ to }) => {
 		if (!to?.url || typeof navigator.sendBeacon !== 'function') return;
 		navigator.sendBeacon('/api/aufruf', to.url.pathname);
+	});
+
+	// Weicher Seitenwechsel; Filter und Auswahl auf derselben Seite wechseln ohne Überblendung
+	onNavigate((nav) => {
+		if (!document.startViewTransition || prefersReducedMotion.current) return;
+		if (!nav.to || nav.from?.url.pathname === nav.to.url.pathname) return;
+		return new Promise((resolve) => {
+			document.startViewTransition(async () => {
+				resolve();
+				await nav.complete;
+			});
+		});
 	});
 </script>
 
@@ -51,8 +64,8 @@
 		top: 0.5rem;
 		z-index: 100;
 		padding: 0.6rem 1rem;
-		background: #fff;
-		color: #000;
+		background: var(--grad);
+		color: #fff;
 		font-weight: 700;
 	}
 	.skip:focus {
@@ -60,8 +73,8 @@
 	}
 	.notice {
 		padding: 0.5rem 1rem;
-		background: #fff;
-		color: #000;
+		background: var(--grad);
+		color: #fff;
 		font-size: 0.85rem;
 		font-weight: 650;
 		text-align: center;
@@ -75,8 +88,9 @@
 		bottom: 0.75rem;
 		z-index: 30;
 		padding: 0.35rem 0.7rem;
-		background: #fff;
-		color: #000;
+		background: var(--grad);
+		color: #fff;
+		box-shadow: var(--glow);
 		font-size: 0.75rem;
 		font-weight: 750;
 		text-transform: uppercase;
