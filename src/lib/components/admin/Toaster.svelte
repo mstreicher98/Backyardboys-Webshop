@@ -35,8 +35,10 @@
 		gap: 0.6rem;
 		padding: 0.75rem 0.75rem 0.75rem 1rem;
 		border-radius: 12px;
-		background: var(--c-ink);
-		color: #fff;
+		/* immer dunkle Fläche mit heller Schrift – im dunklen Design etwas angehoben und umrandet */
+		background: #18181b;
+		border: 1px solid transparent;
+		color: #fafafa;
 		box-shadow: var(--shadow-pop);
 		font-weight: 550;
 		pointer-events: auto;
@@ -44,8 +46,20 @@
 	.toast[data-kind='ok'] :global(svg:first-child) {
 		color: #6fd3a2;
 	}
-	.toast[data-kind='error'] {
+	:global(:root[data-theme='dark']) .toast {
+		background: #27272a;
+		border-color: #3f3f46;
+	}
+	@media (prefers-color-scheme: dark) {
+		:global(:root:not([data-theme='light'])) .toast {
+			background: #27272a;
+			border-color: #3f3f46;
+		}
+	}
+	.toast[data-kind='error'],
+	:global(:root) .toast[data-kind='error'] {
 		background: #8c1d15;
+		border-color: #b3261e;
 	}
 	span {
 		flex: 1;

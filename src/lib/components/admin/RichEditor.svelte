@@ -187,7 +187,7 @@
 		color: var(--c-ink);
 	}
 	.bar button.on {
-		background: var(--c-ink);
+		background: var(--grad);
 		color: #fff;
 	}
 	.bar button:disabled {
