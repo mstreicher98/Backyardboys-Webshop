@@ -1,3 +1,4 @@
+import { fail } from '@sveltejs/kit';
 import { and, asc, desc, eq, gte, inArray, isNull, lte, sql } from 'drizzle-orm';
 import { todayVienna } from '$lib/format';
 import { can } from '$lib/permissions';
@@ -5,8 +6,8 @@ import { db } from '$lib/server/db';
 import { dekorJobs, messages, orders, pageViews, payments, products, variants } from '$lib/server/db/schema';
 import { requireUser } from '$lib/server/guard';
 import { getSecrets } from '$lib/server/secrets';
-import { companyGaps, getSettings } from '$lib/server/settings';
-import type { PageServerLoad } from './$types';
+import { companyGaps, getSettings, saveSettings } from '$lib/server/settings';
+import type { Actions, PageServerLoad } from './$types';
 
 function monthStart(): Date {
 	const t = todayVienna();
@@ -90,20 +91,26 @@ export const load: PageServerLoad = async ({ locals }) => {
 		finance = { month: Number(m?.n ?? 0), today: Number(t?.n ?? 0), monthOrders: Number(c?.n ?? 0) };
 	}
 
-	// Checkliste für den Start
-	const setup: { label: string; href: string; done: boolean }[] = [
-		{ label: 'Firmendaten vollständig (Adresse, Firmenbuch, Bank)', href: '/admin/einstellungen', done: companyGaps(s).length === 0 },
+	// Checkliste für den Start: manches erkennt das System selbst (auto), alles lässt sich von Hand abhaken
+	const checks: { key: SetupKey; label: string; href: string; auto: boolean }[] = [
+		{ key: 'firma', label: 'Firmendaten vollständig (Adresse, Firmenbuch, Bank)', href: '/admin/einstellungen', auto: companyGaps(s).length === 0 },
 		{
+			key: 'zahlung',
 			label: 'Online-Zahlung eingerichtet (Stripe oder PayPal)',
 			href: '/admin/einstellungen?tab=zahlung',
-			done: (s.payments.stripe.enabled && !!secrets.stripeSecretKey && !!secrets.stripeWebhookSecret) || (s.payments.paypal.enabled && !!secrets.paypalClientId)
+			auto: (s.payments.stripe.enabled && !!secrets.stripeSecretKey && !!secrets.stripeWebhookSecret) || (s.payments.paypal.enabled && !!secrets.paypalClientId)
 		},
-		{ label: 'E-Mail-Versand (SMTP) eingerichtet', href: '/admin/einstellungen?tab=email', done: !!s.mail.host },
-		{ label: 'Versandländer und Preise geprüft', href: '/admin/einstellungen?tab=versand', done: false },
-		{ label: 'Aufpreise für Base & Finish festgelegt', href: '/admin/upgrades', done: false },
-		{ label: 'Erstes Produkt veröffentlicht', href: '/admin/produkte', done: Number(activeCount?.n ?? 0) > 0 },
-		{ label: 'Rechtstexte geprüft (AGB, Widerruf, Datenschutz, Impressum)', href: '/admin/seiten', done: false }
+		{ key: 'email', label: 'E-Mail-Versand (SMTP) eingerichtet', href: '/admin/einstellungen?tab=email', auto: !!s.mail.host },
+		{ key: 'versand', label: 'Versandländer und Preise geprüft', href: '/admin/einstellungen?tab=versand', auto: false },
+		{ key: 'aufpreise', label: 'Aufpreise für Base & Finish festgelegt', href: '/admin/upgrades', auto: false },
+		{ key: 'produkt', label: 'Erstes Produkt veröffentlicht', href: '/admin/produkte', auto: Number(activeCount?.n ?? 0) > 0 },
+		{ key: 'rechtstexte', label: 'Rechtstexte geprüft (AGB, Widerruf, Datenschutz, Impressum)', href: '/admin/seiten', auto: false }
 	];
+	const setup = checks.map((c) => {
+		const manual = s.setup.done.includes(c.key);
+		return { ...c, manual, done: c.auto || manual };
+	});
+	const allDone = setup.every((c) => c.done);
 
 	return {
 		finance,
@@ -114,6 +121,33 @@ export const load: PageServerLoad = async ({ locals }) => {
 		unread: unread.map((u) => ({ ...u, n: Number(u.n) })),
 		views: series,
 		drafts: Number(draftCount?.n ?? 0),
-		setup: setup.filter((x) => !x.done).length ? setup : []
+		// ist alles erledigt, lässt sich die Liste ausblenden; öffnet sich ein Punkt wieder, erscheint sie erneut
+		setup: allDone && s.setup.hidden ? [] : setup,
+		setupAllDone: allDone,
+		canEditSetup: can(me.role, 'settings.manage')
 	};
+};
+
+const SETUP_KEYS = ['firma', 'zahlung', 'email', 'versand', 'aufpreise', 'produkt', 'rechtstexte'] as const;
+type SetupKey = (typeof SETUP_KEYS)[number];
+
+export const actions: Actions = {
+	/** Punkt der Start-Checkliste von Hand abhaken oder wieder öffnen */
+	setup: async ({ request, locals }) => {
+		const me = requireUser(locals);
+		if (!can(me.role, 'settings.manage')) return fail(403, { error: 'Nur Admins können die Checkliste abhaken.' });
+		const form = await request.formData();
+		const s = await getSettings();
+		if (form.get('ausblenden')) {
+			await saveSettings('setup', { hidden: true });
+			return { ok: true };
+		}
+		const key = String(form.get('punkt') ?? '') as SetupKey;
+		if (!SETUP_KEYS.includes(key)) return fail(400, { error: 'Unbekannter Punkt.' });
+		const done = new Set(s.setup.done);
+		if (done.has(key)) done.delete(key);
+		else done.add(key);
+		await saveSettings('setup', { done: [...done], hidden: false });
+		return { ok: true };
+	}
 };

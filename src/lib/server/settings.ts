@@ -94,6 +94,13 @@ export interface ShopSettings {
 		notice: string;
 		noticeEn: string;
 	};
+	/** Start-Checkliste in der Übersicht */
+	setup: {
+		/** Von Hand abgehakte Punkte (Schlüssel aus der Übersicht) */
+		done: string[];
+		/** Checkliste ausgeblendet, sobald alles erledigt ist */
+		hidden: boolean;
+	};
 }
 
 export const DEFAULT_SETTINGS: ShopSettings = {
@@ -142,7 +149,8 @@ export const DEFAULT_SETTINGS: ShopSettings = {
 		heroTextEn: 'Motorcycle graphics from Austria: fully custom, based on our templates or as a reprint – made to fit your model.',
 		notice: '',
 		noticeEn: ''
-	}
+	},
+	setup: { done: [], hidden: false }
 };
 
 const KEY = 'shop';

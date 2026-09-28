@@ -1,12 +1,13 @@
 <script lang="ts">
+	import { enhance } from '$app/forms';
 	import Check from '@lucide/svelte/icons/check';
-	import Circle from '@lucide/svelte/icons/circle';
 	import ViewsChart from '$lib/components/admin/ViewsChart.svelte';
 	import { badgeClass, DEKOR_STATUS_LABEL, DEKOR_TYPE_LABEL, euro, ORDER_STATUS_LABEL } from '$lib/admin-labels';
 	import { formatStamp, formatNumber } from '$lib/format';
 
 	let { data } = $props();
 	const totalViews = $derived(data.views.reduce((a, v) => a + v.n, 0));
+	const keep = () => async ({ update }: { update: (o?: { reset?: boolean }) => Promise<void> }) => update({ reset: false });
 </script>
 
 <svelte:head><title>Übersicht | BYB Intern</title></svelte:head>
@@ -20,17 +21,50 @@
 </div>
 
 {#if data.setup.length}
-	<section class="card card-pad setup">
-		<h2 class="card-title">Vor dem Start</h2>
-		<p class="card-sub">Diese Punkte sollten erledigt sein, bevor der Shop öffentlich wird.</p>
-		<ul>
-			{#each data.setup as s (s.label)}
-				<li class:done={s.done}>
-					{#if s.done}<Check size={17} />{:else}<Circle size={17} />{/if}
-					<a href={s.href}>{s.label}</a>
-				</li>
-			{/each}
-		</ul>
+	<section class="card card-pad setup" class:all-done={data.setupAllDone}>
+		<div class="setup-head">
+			<div>
+				<h2 class="card-title">Vor dem Start</h2>
+				<p class="card-sub">
+					{data.setupAllDone
+						? 'Alles erledigt – der Shop kann öffentlich werden.'
+						: data.canEditSetup
+							? 'Diese Punkte sollten erledigt sein, bevor der Shop öffentlich wird. Erledigtes zum Abhaken anklicken.'
+							: 'Diese Punkte sollten erledigt sein, bevor der Shop öffentlich wird.'}
+				</p>
+			</div>
+			{#if data.setupAllDone && data.canEditSetup}
+				<form method="POST" action="?/setup" use:enhance={keep}>
+					<button class="btn btn-sm" name="ausblenden" value="1">Checkliste ausblenden</button>
+				</form>
+			{/if}
+		</div>
+		<form method="POST" action="?/setup" use:enhance={keep}>
+			<ul>
+				{#each data.setup as s (s.key)}
+					<li class:done={s.done}>
+						{#if s.auto}
+							<span class="tick on auto" title="Vom System erkannt"><Check size={13} strokeWidth={3} /></span>
+						{:else}
+							<button
+								class="tick"
+								class:on={s.done}
+								name="punkt"
+								value={s.key}
+								aria-pressed={s.done}
+								aria-label={s.done ? `„${s.label}“ wieder öffnen` : `„${s.label}“ als erledigt abhaken`}
+								title={s.done ? 'Wieder öffnen' : 'Als erledigt abhaken'}
+								disabled={!data.canEditSetup}
+							>
+								{#if s.done}<Check size={13} strokeWidth={3} />{/if}
+							</button>
+						{/if}
+						<a href={s.href}>{s.label}</a>
+						{#if s.auto}<span class="how">automatisch erkannt</span>{/if}
+					</li>
+				{/each}
+			</ul>
+		</form>
 	</section>
 {/if}
 
@@ -137,20 +171,28 @@
 		margin-bottom: 1.25rem;
 		border-left: 4px solid var(--c-warn);
 	}
+	.setup.all-done {
+		border-left-color: var(--c-ok);
+	}
+	.setup-head {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: flex-start;
+		justify-content: space-between;
+		gap: 0.75rem;
+	}
 	.setup ul {
 		display: flex;
 		flex-direction: column;
-		gap: 0.4rem;
+		gap: 0.2rem;
 		margin-top: 0.9rem;
 	}
 	.setup li {
 		display: flex;
 		align-items: center;
-		gap: 0.55rem;
+		gap: 0.65rem;
+		min-height: 2rem;
 		color: var(--c-ink-2);
-	}
-	.setup li.done {
-		color: var(--c-ok);
 	}
 	.setup li.done a {
 		text-decoration: line-through;
@@ -158,6 +200,46 @@
 	}
 	.setup a {
 		color: inherit;
+	}
+	.how {
+		font-size: 0.78rem;
+		color: var(--c-ink-3);
+	}
+	/* Haken: leerer Kreis, abgehakt im Akzentverlauf */
+	.tick {
+		display: grid;
+		place-items: center;
+		flex-shrink: 0;
+		width: 1.35rem;
+		height: 1.35rem;
+		border-radius: 999px;
+		border: 1.5px solid var(--c-line-strong);
+		background: var(--c-surface);
+		color: #fff;
+		transition:
+			border-color 150ms,
+			transform 150ms var(--ease-out);
+	}
+	button.tick:hover:not(:disabled) {
+		border-color: var(--c-accent);
+		transform: scale(1.08);
+	}
+	button.tick:disabled {
+		cursor: default;
+	}
+	.tick.on {
+		border-color: transparent;
+		background: var(--grad);
+		animation: tick-pop 360ms cubic-bezier(0.34, 1.56, 0.64, 1);
+	}
+	.tick.auto {
+		background: var(--c-ok);
+		animation: none;
+	}
+	@keyframes tick-pop {
+		from {
+			transform: scale(0.6);
+		}
 	}
 	.kpis {
 		display: grid;
